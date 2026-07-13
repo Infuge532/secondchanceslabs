@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 640" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Placeholder slab image">
+  <defs>
+    <linearGradient id="w2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#271C13"/><stop offset="0.55" stop-color="#362718"/><stop offset="1" stop-color="#271C13"/>
+    </linearGradient>
+    <linearGradient id="r2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#173A4A"/><stop offset="0.5" stop-color="#2E7A99"/><stop offset="1" stop-color="#173A4A"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="640" fill="url(#w2)"/>
+  <g stroke-width="1.6" fill="none" opacity="0.5" stroke="#362718">
+    <path d="M0 90 C 200 70, 400 115, 800 85" stroke="#553E29"/>
+    <path d="M0 150 C 220 130, 440 175, 800 145" stroke="#553E29"/>
+    <path d="M0 210 C 190 192, 380 235, 800 205" stroke="#4A3524"/>
+    <path d="M0 600 C 210 580, 420 625, 800 595" stroke="#553E29"/>
+    <path d="M0 660 C 230 642, 460 682, 800 655" stroke="#4A3524"/>
+  </g>
+  <path d="M0 420 C 160 370, 300 480, 460 420 S 700 375, 800 430 L 800 510 C 640 460, 500 550, 340 500 S 120 460, 0 515 Z" fill="url(#r2)" opacity="0.92"/>
+</svg>

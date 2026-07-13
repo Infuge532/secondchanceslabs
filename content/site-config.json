@@ -1,0 +1,29 @@
+{
+  "_readme": "EDIT THIS FILE to update the website — no code changes needed. Keep the quotes and commas exactly as they are. After saving, re-upload/redeploy this one file (or ask your web admin). Everything the founder should touch is in this file.",
+
+  "leadTime": {
+    "status": "Now booking",
+    "bookingWindow": "September 2026",
+    "slotsTotal": 3,
+    "slotsRemaining": 2,
+    "note": "Large conference builds reserve two slots."
+  },
+
+  "typicalTimelines": [
+    { "piece": "Coffee table", "hours": "~40 hrs", "weeks": "4–6 weeks" },
+    { "piece": "Dining table", "hours": "80–100 hrs", "weeks": "8–10 weeks" },
+    { "piece": "Conference table", "hours": "150+ hrs", "weeks": "10–14 weeks" }
+  ],
+
+  "contact": {
+    "email": "hello@secondchanceslabs.com",
+    "location": "Kansas City, Missouri",
+    "facebook": "https://www.facebook.com/",
+    "phoneDisplay": ""
+  },
+
+  "announcement": {
+    "enabled": false,
+    "text": "Now accepting commissions for early 2027."
+  }
+}

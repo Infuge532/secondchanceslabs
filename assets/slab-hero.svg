@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Placeholder: walnut slab with epoxy river">
+  <defs>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B1F17"/>
+      <stop offset="0.5" stop-color="#3A2A1E"/>
+      <stop offset="1" stop-color="#241A12"/>
+    </linearGradient>
+    <linearGradient id="river" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#123B33"/>
+      <stop offset="0.5" stop-color="#2E7A6A"/>
+      <stop offset="1" stop-color="#123B33"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#wood)"/>
+  <g stroke="#4A3524" stroke-width="2" fill="none" opacity="0.55">
+    <path d="M0 120 C 400 90, 800 160, 1600 110"/>
+    <path d="M0 200 C 450 170, 900 240, 1600 190"/>
+    <path d="M0 290 C 380 260, 760 330, 1600 275"/>
+    <path d="M0 640 C 420 610, 840 680, 1600 630"/>
+    <path d="M0 730 C 460 700, 920 770, 1600 720"/>
+    <path d="M0 820 C 400 795, 800 855, 1600 810"/>
+  </g>
+  <g stroke="#59412C" stroke-width="1" fill="none" opacity="0.4">
+    <path d="M0 160 C 420 135, 840 195, 1600 150"/>
+    <path d="M0 250 C 400 225, 800 285, 1600 240"/>
+    <path d="M0 685 C 440 660, 880 720, 1600 675"/>
+    <path d="M0 775 C 420 752, 840 808, 1600 765"/>
+  </g>
+  <ellipse cx="1180" cy="215" rx="70" ry="34" fill="none" stroke="#59412C" stroke-width="2" opacity="0.5"/>
+  <ellipse cx="1180" cy="215" rx="42" ry="19" fill="none" stroke="#59412C" stroke-width="1.5" opacity="0.5"/>
+  <ellipse cx="1180" cy="215" rx="18" ry="8" fill="#1C130C" opacity="0.7"/>
+  <path d="M0 470 C 300 400, 560 560, 860 470 S 1350 380, 1600 460 L 1600 560 C 1300 500, 1000 620, 700 545 S 250 470, 0 560 Z" fill="url(#river)" opacity="0.92"/>
+  <path d="M0 470 C 300 400, 560 560, 860 470 S 1350 380, 1600 460" fill="none" stroke="#4FBFA6" stroke-width="2" opacity="0.5"/>
+  <path d="M0 560 C 250 470, 400 545, 700 545 S 1300 500, 1600 560" fill="none" stroke="#4FBFA6" stroke-width="2" opacity="0.35"/>
+  <circle cx="520" cy="500" r="10" fill="#0E2B25" opacity="0.8"/>
+  <circle cx="547" cy="512" r="6" fill="#0E2B25" opacity="0.8"/>
+  <circle cx="1090" cy="480" r="8" fill="#0E2B25" opacity="0.8"/>
+</svg>
