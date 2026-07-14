@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=e5d87356">
 </head>
 <body>
 
@@ -38,25 +38,10 @@
 
   <section class="tight">
     <div class="container">
-      <div class="work-grid">
-        <a class="work-item reveal" href="contact.html">
-          <div class="art tall"></div>
-          <div class="work-meta"><small>Dining &middot; 150 hours</small><strong>Walnut River Dining Table</strong></div>
-        </a>
-        <a class="work-item reveal d1" href="contact.html">
-          <div class="art rock tall"></div>
-          <div class="work-meta"><small>Living room &middot; sold</small><strong>River Rock Sofa Table</strong></div>
-        </a>
-        <a class="work-item reveal" href="contact.html">
-          <div class="art river-green tall"></div>
-          <div class="work-meta"><small>Commission &middot; in design</small><strong>12-ft Conference Table</strong></div>
-        </a>
-        <a class="work-item reveal d1" href="contact.html">
-          <div class="art grain tall"></div>
-          <div class="work-meta"><small>Where it began</small><strong>The Breckenridge Mantle</strong></div>
-        </a>
+      <div class="work-grid" id="gallery-grid">
+        <!-- populated by JS -->
       </div>
-      <p class="form-note center" style="margin-top:2rem;">Photography session in progress — these tiles will be replaced with photos of each finished piece.</p>
+      <p class="form-note center" id="gallery-empty-note" style="margin-top:2rem;display:none;">Photography session in progress — photos coming soon.</p>
     </div>
   </section>
 
@@ -134,6 +119,31 @@
     </div>
   </footer>
 
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=651be482"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+  (function(){
+    const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    const grid = document.getElementById('gallery-grid');
+    const emptyNote = document.getElementById('gallery-empty-note');
+
+    sb.from('gallery_photos').select('*').order('sort_order').order('created_at').then(({ data, error }) => {
+      if (error || !data || !data.length) {
+        emptyNote.style.display = 'block';
+        return;
+      }
+      grid.innerHTML = data.map((p, i) => {
+        const url = sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl;
+        const cls = i % 2 === 1 ? 'work-item reveal d1' : 'work-item reveal';
+        const meta = [p.category, p.caption].filter(Boolean).join(' · ');
+        return '<a class="' + cls + '" href="contact.html">' +
+          '<div class="art tall" style="background-image:url(' + url + ');background-size:cover;background-position:center"></div>' +
+          '<div class="work-meta"><small>' + (meta || '&nbsp;') + '</small><strong>' + (p.piece_name || '') + '</strong></div>' +
+          '</a>';
+      }).join('');
+    });
+  })();
+  </script>
 </body>
 </html>

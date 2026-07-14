@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Second Chance Slabs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --admin-bg: #f5f3ef;
+      --admin-card: #ffffff;
+      --admin-border: #e0dbd3;
+      --admin-text: #1a1a1a;
+      --admin-muted: #6b6660;
+      --admin-accent: #2d6a4f;
+      --admin-danger: #c0392b;
+      --admin-radius: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Manrope', sans-serif; background: var(--admin-bg); color: var(--admin-text); min-height: 100vh; }
+
+    /* ── Auth Screen ── */
+    #auth-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: var(--admin-bg);
+    }
+    .auth-card {
+      background: var(--admin-card); border: 1px solid var(--admin-border);
+      border-radius: 12px; padding: 2.5rem; width: 100%; max-width: 380px;
+    }
+    .auth-card h1 { font-size: 1.4rem; margin-bottom: 0.3rem; }
+    .auth-card p { color: var(--admin-muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+    .auth-card label { display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; color: var(--admin-muted); }
+    .auth-card input { width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--admin-border); border-radius: var(--admin-radius); font-size: 0.9rem; font-family: inherit; outline: none; margin-bottom: 1rem; }
+    .auth-card input:focus { border-color: var(--admin-accent); }
+    .auth-error { color: var(--admin-danger); font-size: 0.85rem; margin-bottom: 0.75rem; display: none; }
+
+    /* ── Admin Layout ── */
+    #admin-screen { display: none; }
+    .admin-topbar {
+      background: #1a1a1a; color: #fff; padding: 0.9rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .admin-topbar-brand { font-size: 1rem; font-weight: 700; }
+    .admin-topbar-right { display: flex; align-items: center; gap: 1rem; }
+    .admin-topbar-right a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; }
+    .admin-topbar-right a:hover { color: #fff; }
+
+    .admin-nav {
+      background: var(--admin-card); border-bottom: 1px solid var(--admin-border);
+      padding: 0 2rem; display: flex; gap: 0;
+    }
+    .admin-nav-btn {
+      padding: 1rem 1.25rem; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      border: none; background: none; border-bottom: 3px solid transparent;
+      color: var(--admin-muted); font-family: inherit; transition: color 0.15s;
+    }
+    .admin-nav-btn.active { color: var(--admin-text); border-bottom-color: var(--admin-accent); }
+    .admin-nav-btn:hover { color: var(--admin-text); }
+
+    .admin-content { padding: 2rem; max-width: 960px; margin: 0 auto; }
+
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+
+    .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .panel-header h2 { font-size: 1.2rem; }
+    .panel-header p { color: var(--admin-muted); font-size: 0.85rem; margin-top: 0.2rem; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      background: var(--admin-accent); color: #fff; border: none;
+      padding: 0.6rem 1.2rem; border-radius: var(--admin-radius);
+      font-size: 0.875rem; font-weight: 700; cursor: pointer; font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-danger {
+      background: none; color: var(--admin-danger); border: 1px solid var(--admin-danger);
+      padding: 0.4rem 0.8rem; border-radius: var(--admin-radius);
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-danger:hover { background: var(--admin-danger); color: #fff; }
+    .btn-ghost {
+      background: none; border: 1px solid var(--admin-border); color: var(--admin-text);
+      padding: 0.4rem 0.8rem; border-radius: var(--admin-radius);
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .btn-ghost:hover { background: var(--admin-bg); }
+
+    /* ── Upload Zone ── */
+    .upload-zone {
+      border: 2px dashed var(--admin-border); border-radius: var(--admin-radius);
+      padding: 2.5rem 1.5rem; text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s; margin-bottom: 1.5rem;
+    }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--admin-accent); background: rgba(45,106,79,0.04); }
+    .upload-zone input[type="file"] { display: none; }
+    .upload-zone-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .upload-zone p { color: var(--admin-muted); font-size: 0.875rem; }
+    .upload-zone strong { color: var(--admin-accent); }
+    .upload-progress { display: none; margin-top: 0.75rem; }
+    .upload-bar-wrap { background: var(--admin-border); border-radius: 99px; height: 6px; overflow: hidden; }
+    .upload-bar-fill { background: var(--admin-accent); height: 100%; width: 0; transition: width 0.3s; }
+    .upload-status { font-size: 0.8rem; color: var(--admin-muted); margin-top: 0.4rem; }
+
+    /* ── Gallery Grid ── */
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .gallery-item {
+      background: var(--admin-card); border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); overflow: hidden; position: relative;
+    }
+    .gallery-thumb {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+      background: var(--admin-bg);
+    }
+    .gallery-thumb-placeholder {
+      width: 100%; aspect-ratio: 4/3; background: var(--admin-bg);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--admin-muted); font-size: 0.75rem;
+    }
+    .gallery-item-body { padding: 0.6rem 0.75rem 0.75rem; }
+    .gallery-item-name { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gallery-item-meta { font-size: 0.75rem; color: var(--admin-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gallery-item-footer { padding: 0.5rem 0.75rem; border-top: 1px solid var(--admin-border); display: flex; justify-content: flex-end; }
+    .gallery-empty { color: var(--admin-muted); font-size: 0.875rem; padding: 2rem; text-align: center; background: var(--admin-card); border: 1px solid var(--admin-border); border-radius: var(--admin-radius); }
+
+    /* ── Upload Form Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--admin-card); border-radius: 12px; padding: 2rem;
+      width: 100%; max-width: 480px; margin: 1rem;
+    }
+    .modal h3 { font-size: 1.1rem; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--admin-muted); margin-bottom: 0.4rem; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); font-size: 0.875rem; font-family: inherit; outline: none;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--admin-accent); }
+    .modal-preview { width: 100%; max-height: 200px; object-fit: contain; border-radius: 6px; background: var(--admin-bg); margin-bottom: 1rem; display: none; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+    /* ── Process Stages ── */
+    .stage-list { display: flex; flex-direction: column; gap: 1rem; }
+    .stage-item {
+      background: var(--admin-card); border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); display: flex; align-items: center; gap: 1rem; padding: 1rem;
+    }
+    .stage-thumb {
+      width: 100px; height: 70px; object-fit: cover; border-radius: 6px;
+      background: var(--admin-bg); flex-shrink: 0;
+    }
+    .stage-thumb-empty {
+      width: 100px; height: 70px; border-radius: 6px; background: var(--admin-bg);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 0.7rem; color: var(--admin-muted); text-align: center; padding: 0.4rem;
+    }
+    .stage-info { flex: 1; min-width: 0; }
+    .stage-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--admin-muted); }
+    .stage-name { font-size: 0.95rem; font-weight: 700; margin-top: 0.1rem; }
+    .stage-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .stage-file-input { display: none; }
+
+    /* ── FAQs ── */
+    .faq-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .faq-tab { padding: 0.5rem 1rem; border-radius: var(--admin-radius); font-size: 0.875rem; font-weight: 600; cursor: pointer; border: 1px solid var(--admin-border); background: var(--admin-card); font-family: inherit; }
+    .faq-tab.active { background: var(--admin-accent); color: #fff; border-color: var(--admin-accent); }
+    .faq-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .faq-item {
+      background: var(--admin-card); border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); padding: 1rem;
+    }
+    .faq-item-q { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .faq-item-a { font-size: 0.85rem; color: var(--admin-muted); line-height: 1.55; }
+    .faq-item-footer { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--admin-border); }
+    .faq-add-form {
+      background: var(--admin-card); border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); padding: 1.25rem; margin-top: 1rem;
+    }
+    .faq-add-form h4 { font-size: 0.9rem; margin-bottom: 1rem; }
+    .faq-add-form textarea {
+      width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); font-size: 0.875rem; font-family: inherit;
+      outline: none; resize: vertical; min-height: 80px;
+    }
+    .faq-add-form textarea:focus { border-color: var(--admin-accent); }
+    .faq-add-form .modal-actions { margin-top: 1rem; }
+
+    /* ── Edit Modal ── */
+    .edit-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 1000; align-items: center; justify-content: center;
+    }
+    .edit-modal-overlay.open { display: flex; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; background: #1a1a1a; color: #fff;
+      padding: 0.75rem 1.25rem; border-radius: var(--admin-radius); font-size: 0.875rem;
+      z-index: 9999; opacity: 0; transform: translateY(8px);
+      transition: opacity 0.25s, transform 0.25s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: var(--admin-danger); }
+
+    /* ── Spinner ── */
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ── Auth Screen ─────────────────────────────────────────────────────────── -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <h1>Second Chance Slabs</h1>
+    <p>Admin panel — sign in to continue</p>
+    <div class="auth-error" id="auth-error"></div>
+    <label for="auth-email">Email</label>
+    <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="username">
+    <label for="auth-password">Password</label>
+    <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
+    <button class="btn-primary" id="auth-btn" style="width:100%" onclick="signIn()">Sign in</button>
+  </div>
+</div>
+
+<!-- ── Admin Screen ────────────────────────────────────────────────────────── -->
+<div id="admin-screen">
+  <div class="admin-topbar">
+    <span class="admin-topbar-brand">Second Chance Slabs — Admin</span>
+    <div class="admin-topbar-right">
+      <a href="index.html" target="_blank">View site →</a>
+      <a href="#" onclick="signOut();return false;">Sign out</a>
+    </div>
+  </div>
+
+  <nav class="admin-nav">
+    <button class="admin-nav-btn active" onclick="showPanel('gallery')">Gallery Photos</button>
+    <button class="admin-nav-btn" onclick="showPanel('process')">Process Photos</button>
+    <button class="admin-nav-btn" onclick="showPanel('faqs')">FAQs</button>
+  </nav>
+
+  <div class="admin-content">
+
+    <!-- Gallery Panel -->
+    <div class="admin-panel active" id="panel-gallery">
+      <div class="panel-header">
+        <div>
+          <h2>Gallery Photos</h2>
+          <p>Photos appear on The Work page and the homepage preview (top 2 by order).</p>
+        </div>
+      </div>
+
+      <div class="upload-zone" id="gallery-drop" onclick="document.getElementById('gallery-file-input').click()">
+        <input type="file" id="gallery-file-input" accept="image/jpeg,image/png,image/webp" multiple>
+        <div class="upload-zone-icon">📷</div>
+        <p><strong>Click to upload</strong> or drag and drop</p>
+        <p>JPG, PNG, WebP — max 10MB per file</p>
+        <div class="upload-progress" id="gallery-upload-progress">
+          <div class="upload-bar-wrap"><div class="upload-bar-fill" id="gallery-bar"></div></div>
+          <div class="upload-status" id="gallery-upload-status">Uploading…</div>
+        </div>
+      </div>
+
+      <div class="gallery-grid" id="gallery-grid">
+        <div class="gallery-empty">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Process Panel -->
+    <div class="admin-panel" id="panel-process">
+      <div class="panel-header">
+        <div>
+          <h2>Process Stage Photos</h2>
+          <p>One photo per stage — click Replace to swap it out.</p>
+        </div>
+      </div>
+      <div class="stage-list" id="stage-list">
+        <div class="gallery-empty">Loading…</div>
+      </div>
+    </div>
+
+    <!-- FAQs Panel -->
+    <div class="admin-panel" id="panel-faqs">
+      <div class="panel-header">
+        <div>
+          <h2>FAQs</h2>
+          <p>Manage questions for the Commission page and The Process page.</p>
+        </div>
+      </div>
+
+      <div class="faq-tabs">
+        <button class="faq-tab active" onclick="switchFaqPage('contact', this)">Commission page</button>
+        <button class="faq-tab" onclick="switchFaqPage('process', this)">Process page</button>
+      </div>
+
+      <div class="faq-list" id="faq-list">
+        <div class="gallery-empty">Loading…</div>
+      </div>
+
+      <div class="faq-add-form">
+        <h4>Add a new question</h4>
+        <div class="form-group">
+          <label>Question</label>
+          <input type="text" id="new-faq-q" placeholder="e.g. What wood species do you use?">
+        </div>
+        <div class="form-group">
+          <label>Answer</label>
+          <textarea id="new-faq-a" placeholder="Type the answer here…"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="addFaq()">Add question</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Upload Details Modal ─────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal">
+    <h3>Photo details</h3>
+    <img class="modal-preview" id="modal-preview" alt="">
+    <div class="form-group">
+      <label>Piece name</label>
+      <input type="text" id="modal-piece-name" placeholder="e.g. Walnut River Dining Table">
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="modal-category">
+        <option value="">— none —</option>
+        <option value="Dining">Dining</option>
+        <option value="Coffee &amp; Sofa">Coffee &amp; Sofa</option>
+        <option value="Mantel &amp; Wall">Mantel &amp; Wall</option>
+        <option value="Conference">Conference</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Caption</label>
+      <input type="text" id="modal-caption" placeholder="Short description (optional)">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeUploadModal()">Cancel</button>
+      <button class="btn-primary" id="modal-save-btn" onclick="savePhoto()">Save &amp; upload</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Edit FAQ Modal ──────────────────────────────────────────────────────── -->
+<div class="edit-modal-overlay" id="faq-edit-modal">
+  <div class="modal">
+    <h3>Edit question</h3>
+    <input type="hidden" id="edit-faq-id">
+    <div class="form-group">
+      <label>Question</label>
+      <input type="text" id="edit-faq-q">
+    </div>
+    <div class="form-group">
+      <label>Answer</label>
+      <textarea id="edit-faq-a" style="min-height:100px"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeFaqEditModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveFaqEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ──────────────────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+const STAGE_NAMES = ['Finding the Slab','The Layout','The Pour','CNC Flattening','A Week of Sanding','Finish & Support'];
+
+let pendingFiles = [];
+let currentFileIndex = 0;
+let currentFaqPage = 'contact';
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+async function signIn() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const btn = document.getElementById('auth-btn');
+  const errEl = document.getElementById('auth-error');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Signing in…';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  } else {
+    showAdmin();
+  }
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+document.getElementById('auth-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') signIn();
+});
+
+async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) showAdmin();
+}
+
+function showAdmin() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+  loadGallery();
+  loadProcessPhotos();
+  loadFaqs();
+}
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── Toast ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ── Gallery ──────────────────────────────────────────────────────────────────
+async function loadGallery() {
+  const grid = document.getElementById('gallery-grid');
+  const { data, error } = await sb.from('gallery_photos').select('*').order('sort_order').order('created_at');
+  if (error) { grid.innerHTML = '<div class="gallery-empty">Error loading photos.</div>'; return; }
+  if (!data.length) { grid.innerHTML = '<div class="gallery-empty">No photos yet — upload your first one above.</div>'; return; }
+  grid.innerHTML = data.map(p => {
+    const url = sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl;
+    return `<div class="gallery-item" id="gitem-${p.id}">
+      <img class="gallery-thumb" src="${url}" alt="${p.piece_name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="gallery-thumb-placeholder" style="display:none">No preview</div>
+      <div class="gallery-item-body">
+        <div class="gallery-item-name">${p.piece_name || '(untitled)'}</div>
+        <div class="gallery-item-meta">${p.category || ''}${p.caption ? ' · ' + p.caption : ''}</div>
+      </div>
+      <div class="gallery-item-footer">
+        <button class="btn-danger" onclick="deleteGalleryPhoto('${p.id}', '${p.storage_path}')">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── File drop zone setup ─────────────────────────────────────────────────────
+const dropZone = document.getElementById('gallery-drop');
+const fileInput = document.getElementById('gallery-file-input');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  handleFiles(Array.from(e.dataTransfer.files));
+});
+fileInput.addEventListener('change', () => handleFiles(Array.from(fileInput.files)));
+
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+function handleFiles(files) {
+  const typed = files.filter(f => ALLOWED_TYPES.has(f.type));
+  const tooBig = typed.filter(f => f.size > MAX_FILE_BYTES).map(f => f.name);
+  if (tooBig.length) { showToast(`File${tooBig.length > 1 ? 's' : ''} exceed 10 MB: ${tooBig.join(', ')}`, true); return; }
+  if (!typed.length) { showToast('Only JPG, PNG, and WebP files are accepted.', true); return; }
+  pendingFiles = typed;
+  currentFileIndex = 0;
+  openUploadModal(pendingFiles[0]);
+}
+
+function openUploadModal(file) {
+  const preview = document.getElementById('modal-preview');
+  const reader = new FileReader();
+  reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+  reader.readAsDataURL(file);
+  document.getElementById('modal-piece-name').value = '';
+  document.getElementById('modal-caption').value = '';
+  document.getElementById('modal-category').value = '';
+  document.getElementById('modal-save-btn').disabled = false;
+  document.getElementById('modal-save-btn').textContent = 'Save & upload';
+  document.getElementById('upload-modal').classList.add('open');
+}
+
+function closeUploadModal() {
+  document.getElementById('upload-modal').classList.remove('open');
+  pendingFiles = [];
+}
+
+async function savePhoto() {
+  const btn = document.getElementById('modal-save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Uploading…';
+  const file = pendingFiles[currentFileIndex];
+  const ext = file.name.split('.').pop();
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { error: upErr } = await sb.storage.from('gallery').upload(path, file, { upsert: false });
+  if (upErr) { showToast('Upload failed: ' + upErr.message, true); btn.disabled = false; btn.textContent = 'Save & upload'; return; }
+
+  const pieceName = document.getElementById('modal-piece-name').value.trim();
+  const caption = document.getElementById('modal-caption').value.trim();
+  const category = document.getElementById('modal-category').value;
+
+  const { error: dbErr } = await sb.from('gallery_photos').insert({
+    storage_path: path, piece_name: pieceName, caption, category, sort_order: 0
+  });
+  if (dbErr) { showToast('Saved file but DB insert failed: ' + dbErr.message, true); }
+
+  closeUploadModal();
+  showToast('Photo uploaded!');
+  loadGallery();
+}
+
+async function deleteGalleryPhoto(id, storagePath) {
+  if (!confirm('Remove this photo? This cannot be undone.')) return;
+  await sb.storage.from('gallery').remove([storagePath]);
+  await sb.from('gallery_photos').delete().eq('id', id);
+  document.getElementById('gitem-' + id)?.remove();
+  showToast('Photo removed.');
+  const grid = document.getElementById('gallery-grid');
+  if (!grid.children.length) grid.innerHTML = '<div class="gallery-empty">No photos yet — upload your first one above.</div>';
+}
+
+// ── Process Photos ────────────────────────────────────────────────────────────
+async function loadProcessPhotos() {
+  const list = document.getElementById('stage-list');
+  const { data, error } = await sb.from('process_photos').select('*').order('stage');
+  if (error) { list.innerHTML = '<div class="gallery-empty">Error loading stages.</div>'; return; }
+  list.innerHTML = data.map(s => {
+    const thumbHtml = s.storage_path
+      ? `<img class="stage-thumb" src="${sb.storage.from('gallery').getPublicUrl(s.storage_path).data.publicUrl}" alt="${s.alt_text}" onerror="this.style.display='none'">`
+      : `<div class="stage-thumb-empty">No photo yet</div>`;
+    return `<div class="stage-item" id="stage-${s.stage}">
+      ${thumbHtml}
+      <div class="stage-info">
+        <div class="stage-label">Stage ${s.stage}</div>
+        <div class="stage-name">${STAGE_NAMES[s.stage - 1]}</div>
+      </div>
+      <div class="stage-actions">
+        <input type="file" class="stage-file-input" id="stage-input-${s.stage}" accept="image/jpeg,image/png,image/webp" onchange="uploadStagePhoto(${s.stage}, this)">
+        <button class="btn-ghost" onclick="document.getElementById('stage-input-${s.stage}').click()">${s.storage_path ? 'Replace' : 'Upload'}</button>
+        ${s.storage_path ? `<button class="btn-danger" onclick="removeStagePhoto(${s.stage}, '${s.storage_path}')">Remove</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function uploadStagePhoto(stage, input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!ALLOWED_TYPES.has(file.type)) { showToast('Only JPG, PNG, and WebP files are accepted.', true); input.value = ''; return; }
+  if (file.size > MAX_FILE_BYTES) { showToast('File exceeds the 10 MB limit.', true); input.value = ''; return; }
+  const btn = document.querySelector(`#stage-${stage} .btn-ghost`);
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const ext = file.name.split('.').pop();
+  const path = `process/stage-${stage}-${Date.now()}.${ext}`;
+  const { error: upErr } = await sb.storage.from('gallery').upload(path, file, { upsert: true });
+  if (upErr) { showToast('Upload failed: ' + upErr.message, true); btn.innerHTML = 'Replace'; btn.disabled = false; return; }
+
+  const { error: dbErr } = await sb.from('process_photos').update({ storage_path: path }).eq('stage', stage);
+  if (dbErr) { showToast('DB update failed: ' + dbErr.message, true); return; }
+
+  showToast('Stage ' + stage + ' photo updated!');
+  loadProcessPhotos();
+}
+
+async function removeStagePhoto(stage, storagePath) {
+  if (!confirm('Remove the photo for this stage?')) return;
+  await sb.storage.from('gallery').remove([storagePath]);
+  await sb.from('process_photos').update({ storage_path: null }).eq('stage', stage);
+  showToast('Photo removed.');
+  loadProcessPhotos();
+}
+
+// ── FAQs ──────────────────────────────────────────────────────────────────────
+function switchFaqPage(page, btn) {
+  currentFaqPage = page;
+  document.querySelectorAll('.faq-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  loadFaqs();
+}
+
+async function loadFaqs() {
+  const list = document.getElementById('faq-list');
+  list.innerHTML = '<div class="gallery-empty">Loading…</div>';
+  const { data, error } = await sb.from('faqs').select('*').eq('page', currentFaqPage).order('sort_order').order('created_at');
+  if (error) { list.innerHTML = '<div class="gallery-empty">Error loading FAQs.</div>'; return; }
+  if (!data.length) { list.innerHTML = '<div class="gallery-empty">No questions yet — add one below.</div>'; return; }
+  list.innerHTML = data.map(f => `
+    <div class="faq-item" id="faq-${f.id}">
+      <div class="faq-item-q">${escHtml(f.question)}</div>
+      <div class="faq-item-a">${escHtml(f.answer)}</div>
+      <div class="faq-item-footer">
+        <button class="btn-ghost" data-id="${f.id}" data-q="${escHtml(f.question)}" data-a="${escHtml(f.answer)}" onclick="openFaqEditFromBtn(this)">Edit</button>
+        <button class="btn-danger" onclick="deleteFaq('${f.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function addFaq() {
+  const q = document.getElementById('new-faq-q').value.trim();
+  const a = document.getElementById('new-faq-a').value.trim();
+  if (!q || !a) { showToast('Question and answer are both required.', true); return; }
+  const { error } = await sb.from('faqs').insert({ question: q, answer: a, page: currentFaqPage, sort_order: 99 });
+  if (error) { showToast('Error: ' + error.message, true); return; }
+  document.getElementById('new-faq-q').value = '';
+  document.getElementById('new-faq-a').value = '';
+  showToast('Question added!');
+  loadFaqs();
+}
+
+async function deleteFaq(id) {
+  if (!confirm('Delete this question?')) return;
+  await sb.from('faqs').delete().eq('id', id);
+  document.getElementById('faq-' + id)?.remove();
+  showToast('Question deleted.');
+}
+
+function openFaqEditFromBtn(btn) {
+  openFaqEdit(btn.dataset.id, btn.dataset.q, btn.dataset.a);
+}
+function openFaqEdit(id, question, answer) {
+  document.getElementById('edit-faq-id').value = id;
+  document.getElementById('edit-faq-q').value = question;
+  document.getElementById('edit-faq-a').value = answer;
+  document.getElementById('faq-edit-modal').classList.add('open');
+}
+function closeFaqEditModal() {
+  document.getElementById('faq-edit-modal').classList.remove('open');
+}
+async function saveFaqEdit() {
+  const id = document.getElementById('edit-faq-id').value;
+  const q = document.getElementById('edit-faq-q').value.trim();
+  const a = document.getElementById('edit-faq-a').value.trim();
+  if (!q || !a) { showToast('Both fields are required.', true); return; }
+  const { error } = await sb.from('faqs').update({ question: q, answer: a }).eq('id', id);
+  if (error) { showToast('Error: ' + error.message, true); return; }
+  closeFaqEditModal();
+  showToast('Question updated!');
+  loadFaqs();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+checkSession();
+</script>
+</body>
+</html>

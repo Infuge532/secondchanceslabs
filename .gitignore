@@ -1,0 +1,6 @@
+config.js
+node_modules/
+supabase/.temp/
+
+# Local Netlify folder
+.netlify

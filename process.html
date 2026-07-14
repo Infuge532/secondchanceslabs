@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=e5d87356">
 </head>
 <body>
 
@@ -47,7 +47,7 @@
             <p>The more unique the piece, the more it captures the eye. We hunt for walnut with character — quilted grain where a branch compressed the wood, distressed live edges, shapes a lumber mill would call flaws. That's exactly what we're after.</p>
             <p class="fact">Primarily Kansas walnut &middot; kiln-dried up to two weeks</p>
           </div>
-          <div class="art grain"></div>
+          <div class="stage-photo-wrap" data-stage="1"><div class="art grain tall stage-photo-placeholder"></div></div>
         </div>
 
         <div class="step">
@@ -57,7 +57,7 @@
             <p>A simple frame is built to the finished dimensions, and the slabs go down on the floor inside it. Then we play — shifting, flipping, and pairing pieces until the composition feels right. Nancy, with her interior-design background, has the final say.</p>
             <p class="fact">Marked in chalk &middot; cut to fit &middot; approved by Nancy</p>
           </div>
-          <div class="art"></div>
+          <div class="stage-photo-wrap" data-stage="2"><div class="art tall stage-photo-placeholder"></div></div>
         </div>
 
         <div class="step">
@@ -67,7 +67,7 @@
             <p>A clear base coat seals the slab to the form so nothing leaks beneath. Then the river gets poured — Total Boat Fathom epoxy, up to two inches deep, tinted with Eye Candy pigments. The shop stays near 70&deg;F so the exothermic cure never runs hot.</p>
             <p class="fact">3 days to strip the form &middot; 7 days to full cure</p>
           </div>
-          <div class="art river-green"></div>
+          <div class="stage-photo-wrap" data-stage="3"><div class="art river-green tall stage-photo-placeholder"></div></div>
         </div>
 
         <div class="step">
@@ -77,7 +77,7 @@
             <p>The cured table travels to a CNC machine that mills the entire surface dead flat — top and bottom. It's why you can run a hand across the seam between wood and epoxy and feel nothing at all.</p>
             <p class="fact">Machined level &middot; no visible seam</p>
           </div>
-          <div class="art"></div>
+          <div class="stage-photo-wrap" data-stage="4"><div class="art tall stage-photo-placeholder"></div></div>
         </div>
 
         <div class="step">
@@ -87,7 +87,7 @@
             <p>The longest stage. Eight grits, from 60 all the way to 1000, worked across every inch with a Festool sander — top and bottom both. This is where the depth appears: the epoxy turns to glass and the grain lights up underneath it.</p>
             <p class="fact">60 &rarr; 1000 grit &middot; roughly a full week</p>
           </div>
-          <div class="art grain"></div>
+          <div class="stage-photo-wrap" data-stage="5"><div class="art grain tall stage-photo-placeholder"></div></div>
         </div>
 
         <div class="step">
@@ -97,7 +97,7 @@
             <p>A ceramic finish goes on top for a waterproof, furniture-grade surface — and the bottom gets finished too, because unsealed wood drinks moisture like a sponge. Steel C-channels are routed into the underside so the top stays flat through every season.</p>
             <p class="fact">Ceramic top coat &middot; monthly maintenance spray included</p>
           </div>
-          <div class="art"></div>
+          <div class="stage-photo-wrap" data-stage="6"><div class="art tall stage-photo-placeholder"></div></div>
         </div>
 
       </div>
@@ -133,24 +133,7 @@
         <span class="eyebrow reveal">Questions We Hear</span>
         <h2 class="display-lg reveal d1">Before You Ask</h2>
       </div>
-      <div style="margin-top:2.5rem;">
-        <details class="reveal">
-          <summary>How do I care for an epoxy table?</summary>
-          <p>Easily. Once a month, spray on the maintenance solution we include, spread it around, let it dry, and buff. The ceramic finish is waterproof — everyday cleaning is just a soft cloth.</p>
-        </details>
-        <details class="reveal">
-          <summary>What if the table is ever damaged?</summary>
-          <p>Repairs are almost always possible, and for most damage we can do the work right in your home at $150 an hour. When we're done, you won't know it was ever there.</p>
-        </details>
-        <details class="reveal">
-          <summary>Can I pick my own colors?</summary>
-          <p>Yes — that's the point. You choose the epoxy color from Eye Candy's pigment range, the edge profile, and the overall look. We'll guide you through swatches during the design conversation.</p>
-        </details>
-        <details class="reveal">
-          <summary>Why does it take weeks?</summary>
-          <p>The epoxy alone needs seven days to fully cure, kiln-drying fresh slabs can take two weeks, and sanding through eight grits takes most of a week. Every stage we rush is a flaw you'd find later — so we don't rush any of them.</p>
-        </details>
-      </div>
+      <div id="process-faqs" style="margin-top:2.5rem;"></div>
     </div>
   </section>
 
@@ -193,6 +176,34 @@
     </div>
   </footer>
 
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=651be482"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+  (function(){
+    const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+    // Load process stage photos
+    sb.from('process_photos').select('*').order('stage').then(({ data }) => {
+      if (!data) return;
+      data.forEach(row => {
+        if (!row.storage_path) return;
+        const wrap = document.querySelector('.stage-photo-wrap[data-stage="' + row.stage + '"]');
+        if (!wrap) return;
+        const url = sb.storage.from('gallery').getPublicUrl(row.storage_path).data.publicUrl;
+        wrap.innerHTML = '<img src="' + url + '" alt="' + (row.alt_text || '') + '" class="stage-photo tall" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">';
+      });
+    });
+
+    // Load process FAQs
+    sb.from('faqs').select('*').eq('page', 'process').order('sort_order').order('created_at').then(({ data }) => {
+      const el = document.getElementById('process-faqs');
+      if (!el || !data || !data.length) return;
+      el.innerHTML = data.map(f =>
+        '<details class="reveal visible"><summary>' + f.question + '</summary><p>' + f.answer + '</p></details>'
+      ).join('');
+    });
+  })();
+  </script>
 </body>
 </html>
