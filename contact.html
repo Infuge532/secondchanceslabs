@@ -145,148 +145,51 @@
     </div>
   </section>
 
-  <!-- ── Availability Calendar ──────────────────────────────────────────── -->
-  <section class="avail-section" id="availability">
-    <div class="avail-inner">
-      <div class="container">
+  <!-- ── Commissions / Availability ───────────────────────────────────── -->
+  <section class="commissions-section" id="availability">
+    <div class="container">
+      <div class="commissions-grid">
 
-        <div class="avail-intro">
-          <span class="eyebrow reveal">Commission Availability</span>
-          <h2 class="display-lg reveal d1">The Build<br><em class="display-italic">Schedule.</em></h2>
-          <p class="lede reveal d2" style="margin-top:0.9rem;">Every piece takes 6–10 weeks from first pour to final coat. Slots book out months ahead — here's the honest picture.</p>
+        <!-- Left: copy -->
+        <div class="commissions-left">
+          <span class="eyebrow reveal">Commissions</span>
+          <h2 class="display-lg reveal d1">Built one at a time.<br>Booked the same way.</h2>
+          <p class="lede reveal d2">Every table is made to order in a shop that takes on a few pieces at once — which is exactly why they turn out the way they do. Current builds include a pair of book-matched conference tables that will meet end-to-end at <span class="commissions-accent">28&nbsp;feet</span>.</p>
+          <blockquote class="commissions-quote reveal d3">
+            Architects and designers — we spec into commercial and residential projects. <a href="#commission-form">Start a trade inquiry &rarr;</a>
+          </blockquote>
         </div>
 
-        <div class="avail-rows reveal d2">
-
-          <div class="avail-row-item status-booked">
-            <div class="avail-ri-left">
-              <span class="avail-now-badge">Now</span>
-              <span class="avail-ri-month">July</span>
-              <span class="avail-ri-year">2026</span>
+        <!-- Right: booking card -->
+        <div class="commissions-card reveal reveal-right d2">
+          <div class="cc-header">
+            <span class="cc-booking-badge"><span class="cc-dot"></span>NOW BOOKING</span>
+            <span id="cc-month">September 2026</span>
+          </div>
+          <div id="cc-bars" class="cc-bars">
+            <div class="cc-bar cc-bar-filled"></div>
+            <div class="cc-bar cc-bar-filled"></div>
+            <div class="cc-bar cc-bar-empty"></div>
+          </div>
+          <p class="cc-slots-note" id="cc-slots-note">2 of 3 slots open. Large conference builds reserve two slots.</p>
+          <div class="cc-table" id="cc-table">
+            <div class="cc-row">
+              <span class="cc-type">Coffee table</span>
+              <span class="cc-hours">~40&nbsp;hrs</span>
+              <span class="cc-weeks">4–6 weeks</span>
             </div>
-            <div class="avail-ri-center">
-              <div class="avail-slots">
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-taken"></span>
-              </div>
-              <div class="avail-bar-wrap"><div class="avail-bar-fill" style="width:100%"></div></div>
+            <div class="cc-row">
+              <span class="cc-type">Dining table</span>
+              <span class="cc-hours cc-hours-accent">80–100&nbsp;hrs</span>
+              <span class="cc-weeks">8–10 weeks</span>
             </div>
-            <div class="avail-ri-right">
-              <span class="avail-ri-label">Fully Booked</span>
-              <span class="avail-ri-note">In production — no new starts</span>
+            <div class="cc-row">
+              <span class="cc-type">Conference table</span>
+              <span class="cc-hours">150+&nbsp;hrs</span>
+              <span class="cc-weeks">10–14 weeks</span>
             </div>
           </div>
-
-          <div class="avail-row-item status-limited">
-            <div class="avail-ri-left">
-              <span class="avail-ri-month">August</span>
-              <span class="avail-ri-year">2026</span>
-            </div>
-            <div class="avail-ri-center">
-              <div class="avail-slots">
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-open"></span>
-              </div>
-              <div class="avail-bar-wrap"><div class="avail-bar-fill" style="width:75%"></div></div>
-            </div>
-            <div class="avail-ri-right">
-              <span class="avail-ri-label">1 Slot Left</span>
-              <span class="avail-ri-note">One commission start available</span>
-            </div>
-          </div>
-
-          <div class="avail-row-item status-open">
-            <div class="avail-ri-left">
-              <span class="avail-ri-month">September</span>
-              <span class="avail-ri-year">2026</span>
-            </div>
-            <div class="avail-ri-center">
-              <div class="avail-slots">
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-open"></span>
-                <span class="avail-slot s-open"></span>
-                <span class="avail-slot s-open"></span>
-              </div>
-              <div class="avail-bar-wrap"><div class="avail-bar-fill" style="width:25%"></div></div>
-            </div>
-            <div class="avail-ri-right">
-              <span class="avail-ri-label">Available</span>
-              <span class="avail-ri-note">2–3 commission starts open</span>
-            </div>
-          </div>
-
-          <div class="avail-row-item status-open">
-            <div class="avail-ri-left">
-              <span class="avail-ri-month">October</span>
-              <span class="avail-ri-year">2026</span>
-            </div>
-            <div class="avail-ri-center">
-              <div class="avail-slots">
-                <span class="avail-slot s-open"></span>
-                <span class="avail-slot s-open"></span>
-                <span class="avail-slot s-open"></span>
-                <span class="avail-slot s-open"></span>
-              </div>
-              <div class="avail-bar-wrap"><div class="avail-bar-fill" style="width:0%"></div></div>
-            </div>
-            <div class="avail-ri-right">
-              <span class="avail-ri-label">Available</span>
-              <span class="avail-ri-note">2–3 commission starts open</span>
-            </div>
-          </div>
-
-          <div class="avail-row-item status-open">
-            <div class="avail-ri-left">
-              <span class="avail-ri-month">November</span>
-              <span class="avail-ri-year">2026</span>
-            </div>
-            <div class="avail-ri-center">
-              <div class="avail-slots">
-                <span class="avail-slot s-open"></span>
-                <span class="avail-slot s-open"></span>
-                <span class="avail-slot s-open"></span>
-                <span class="avail-slot s-open"></span>
-              </div>
-              <div class="avail-bar-wrap"><div class="avail-bar-fill" style="width:0%"></div></div>
-            </div>
-            <div class="avail-ri-right">
-              <span class="avail-ri-label">Available</span>
-              <span class="avail-ri-note">Holiday delivery possible</span>
-            </div>
-          </div>
-
-          <div class="avail-row-item status-limited">
-            <div class="avail-ri-left">
-              <span class="avail-ri-month">December</span>
-              <span class="avail-ri-year">2026</span>
-            </div>
-            <div class="avail-ri-center">
-              <div class="avail-slots">
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-taken"></span>
-                <span class="avail-slot s-open"></span>
-              </div>
-              <div class="avail-bar-wrap"><div class="avail-bar-fill" style="width:75%"></div></div>
-            </div>
-            <div class="avail-ri-right">
-              <span class="avail-ri-label">Limited</span>
-              <span class="avail-ri-note">Cuts close mid-month for holidays</span>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="avail-footer reveal d3">
-          <div class="avail-legend-v2">
-            <span><i class="avail-sleg s-open"></i>Open slot</span>
-            <span><i class="avail-sleg s-taken"></i>Booked slot</span>
-          </div>
-          <a class="btn btn-dark" href="#commission-form">Claim Your Spot</a>
+          <p class="cc-footer-note">Availability updates come straight from the shop.</p>
         </div>
 
       </div>
@@ -337,12 +240,52 @@
   <script>
   (function(){
     const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+    // FAQs
     sb.from('faqs').select('*').eq('page', 'contact').order('sort_order').order('created_at').then(({ data }) => {
       const el = document.getElementById('contact-faqs');
       if (!el || !data || !data.length) return;
       el.innerHTML = data.map(f =>
         '<details class="reveal visible"><summary>' + f.question + '</summary><p>' + f.answer + '</p></details>'
       ).join('');
+    });
+
+    // Commission availability card
+    sb.from('commission_card').select('*').eq('id', 1).single().then(({ data }) => {
+      if (!data) return;
+
+      const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+      const monthEl = document.getElementById('cc-month');
+      if (monthEl && data.booking_month) monthEl.textContent = data.booking_month;
+
+      const barsEl = document.getElementById('cc-bars');
+      if (barsEl) {
+        const total = Math.max(1, data.slots_total || 3);
+        const filled = Math.min(data.slots_filled || 0, total);
+        barsEl.innerHTML = Array.from({length: total}, (_, i) =>
+          '<div class="cc-bar ' + (i < filled ? 'cc-bar-filled' : 'cc-bar-empty') + '"></div>'
+        ).join('');
+      }
+
+      const noteEl = document.getElementById('cc-slots-note');
+      if (noteEl && data.slots_note) noteEl.textContent = data.slots_note;
+
+      const tableEl = document.getElementById('cc-table');
+      if (tableEl) {
+        const rows = [
+          { type: data.row1_type, hours: data.row1_hours, weeks: data.row1_weeks, accent: data.row1_accent },
+          { type: data.row2_type, hours: data.row2_hours, weeks: data.row2_weeks, accent: data.row2_accent },
+          { type: data.row3_type, hours: data.row3_hours, weeks: data.row3_weeks, accent: data.row3_accent },
+        ].filter(r => r.type);
+        tableEl.innerHTML = rows.map(r =>
+          '<div class="cc-row">' +
+            '<span class="cc-type">' + esc(r.type) + '</span>' +
+            '<span class="cc-hours' + (r.accent ? ' cc-hours-accent' : '') + '">' + esc(r.hours) + '</span>' +
+            '<span class="cc-weeks">' + esc(r.weeks) + '</span>' +
+          '</div>'
+        ).join('');
+      }
     });
   })();
   </script>

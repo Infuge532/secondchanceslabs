@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Work — Second Chance Slabs</title>
+  <meta name="description" content="Photos of a handcrafted walnut and epoxy piece by Second Chance Slabs, Kansas City.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=d8a3e561">
+</head>
+<body>
+
+  <div class="topbar">Now accepting a limited number of fall commissions <a href="contact.html">Start yours &rarr;</a></div>
+
+  <nav class="nav">
+    <ul class="nav-links">
+      <li><a href="gallery.html" class="active">The Work</a></li>
+      <li><a href="process.html">The Process</a></li>
+    </ul>
+    <a class="brand" href="index.html">Second Chance <span>Slabs</span></a>
+    <ul class="nav-links right">
+      <li><a href="about.html">Our Story</a></li>
+      <li><a href="configure.html">Design Yours</a></li>
+      <li><a href="contact.html">Commissions</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <header class="page-hero">
+    <a class="piece-back reveal" href="gallery.html">&larr; All Work</a>
+    <h1 class="display-xl" id="piece-title"><em class="display-italic">Loading&hellip;</em></h1>
+  </header>
+
+  <!-- Carousel -->
+  <section class="carousel-section">
+    <div class="carousel-wrap" id="carousel-wrap">
+      <div class="carousel-track" id="carousel-track">
+        <!-- slides injected by JS -->
+      </div>
+      <button class="carousel-btn carousel-prev" id="carousel-prev" aria-label="Previous photo" disabled>&#8592;</button>
+      <button class="carousel-btn carousel-next" id="carousel-next" aria-label="Next photo">&#8594;</button>
+      <div class="carousel-dots" id="carousel-dots"></div>
+      <div class="carousel-counter" id="carousel-counter"></div>
+      <div class="carousel-progress" id="carousel-progress"></div>
+    </div>
+    <p class="form-note center" id="piece-empty" style="display:none;padding:2rem 0;">No photos found for this piece.</p>
+    <p class="carousel-caption-text" id="carousel-caption"></p>
+  </section>
+
+  <section class="tight">
+    <div class="container">
+      <div class="cta-band reveal">
+        <span class="eyebrow" style="color:var(--sage);">Want One Like This?</span>
+        <h2 class="display-lg">Commission a Piece<br><em class="display-italic">Built Just for You.</em></h2>
+        <p>Tell us the size, the species, the color of the river — or just the room it needs to live in.</p>
+        <a class="btn btn-cream" href="contact.html">Start a Commission</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <a class="footer-brand" href="index.html">Second Chance Slabs</a>
+        <p>Heirloom walnut and epoxy furniture, handcrafted one slab at a time in Kansas City.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="gallery.html">The Work</a></li>
+          <li><a href="process.html">The Process</a></li>
+          <li><a href="about.html">Our Story</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Commissions</h4>
+        <ul>
+          <li><a href="contact.html">Request a piece</a></li>
+          <li><a href="contact.html">Ask a question</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Second Chance Slabs. All rights reserved.</span>
+      <span>Kansas City, Missouri</span>
+    </div>
+  </footer>
+
+  <script src="script.js?v=651be482"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+  (function(){
+    const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    const params = new URLSearchParams(location.search);
+    const projectId = params.get('project') || '';
+    const piece = params.get('piece') || '';
+
+    const titleEl = document.getElementById('piece-title');
+
+    const empty = document.getElementById('piece-empty');
+    const wrap   = document.getElementById('carousel-wrap');
+    const track  = document.getElementById('carousel-track');
+    const dots   = document.getElementById('carousel-dots');
+    const counter = document.getElementById('carousel-counter');
+    const progress = document.getElementById('carousel-progress');
+    const prevBtn  = document.getElementById('carousel-prev');
+    const nextBtn  = document.getElementById('carousel-next');
+    const captionEl = document.getElementById('carousel-caption');
+
+    const INTERVAL = 7000;
+    let current = 0;
+    let total = 0;
+    let timer = null;
+    let captions = [];
+
+    // Build query: project-based (new) or piece_name-based (legacy)
+    let projectName = '';
+    let query;
+    if (projectId) {
+      query = Promise.all([
+        sb.from('gallery_projects').select('name').eq('id', projectId).single(),
+        sb.from('gallery_photos').select('*').eq('project_id', projectId).order('sort_order').order('created_at')
+      ]).then(([{ data: proj }, { data: photos }]) => {
+        projectName = proj ? proj.name : 'Project';
+        return { data: photos || [], error: null };
+      });
+    } else if (piece) {
+      query = sb.from('gallery_photos').select('*').eq('piece_name', piece).order('sort_order').order('created_at');
+      projectName = piece;
+    } else {
+      query = Promise.resolve({ data: [], error: null });
+    }
+
+    // Set title once we know the name
+    if (piece && !projectId) {
+      document.title = piece + ' — Second Chance Slabs';
+      titleEl.textContent = piece;
+    }
+
+    query.then(({ data, error }) => {
+      if (projectId && projectName) {
+        document.title = projectName + ' — Second Chance Slabs';
+        titleEl.textContent = projectName;
+      }
+
+      let photos = data || [];
+
+      if (error || !photos.length) {
+        empty.style.display = 'block';
+        wrap.style.display = 'none';
+        titleEl.innerHTML = '<em class="display-italic">' + (projectName || piece || 'Not Found') + '</em>';
+        return;
+      }
+
+      total = photos.length;
+      captions = photos.map(p => p.caption || '');
+
+      // Build slides
+      track.innerHTML = photos.map((p, i) => {
+        const url = sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl;
+        const num = (i + 1) + ' of ' + photos.length;
+        return '<div class="carousel-slide">' +
+          '<div class="csl-info">' +
+            (p.category ? '<span class="csl-category">' + p.category + '</span>' : '') +
+            (p.caption  ? '<p class="csl-caption">' + p.caption + '</p>' : '') +
+            '<span class="csl-num">' + num + '</span>' +
+          '</div>' +
+          '<div class="csl-img"><img src="' + url + '" alt="' + (p.caption || piece) + '"></div>' +
+        '</div>';
+      }).join('');
+
+      // Build dots
+      photos.forEach((_, i) => {
+        const d = document.createElement('button');
+        d.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        d.setAttribute('aria-label', 'Slide ' + (i + 1));
+        d.addEventListener('click', () => goTo(i, true));
+        dots.appendChild(d);
+      });
+
+      function updateUI() {
+        track.style.transform = 'translateX(-' + (current * 100) + '%)';
+        dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+        counter.textContent = (current + 1) + ' / ' + total;
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === total - 1;
+        captionEl.textContent = captions[current] || '';
+        captionEl.style.opacity = captions[current] ? '1' : '0';
+      }
+
+      function startProgress() {
+        progress.style.transition = 'none';
+        progress.style.width = '0%';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          progress.style.transition = 'width ' + INTERVAL + 'ms linear';
+          progress.style.width = '100%';
+        }));
+      }
+      function stopProgress() {
+        progress.style.transition = 'none';
+        progress.style.width = '0%';
+      }
+
+      function goTo(index, userAction) {
+        current = Math.max(0, Math.min(index, total - 1));
+        updateUI();
+        if (userAction) { stopTimer(); startTimer(); }
+      }
+
+      function startTimer() {
+        timer = setInterval(() => {
+          current = (current + 1) % total;
+          updateUI();
+          startProgress();
+        }, INTERVAL);
+        startProgress();
+      }
+      function stopTimer() { clearInterval(timer); timer = null; stopProgress(); }
+
+      prevBtn.addEventListener('click', () => goTo(current - 1, true));
+      nextBtn.addEventListener('click', () => goTo(current + 1, true));
+
+      // Touch / swipe
+      let touchStartX = 0;
+      wrap.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
+        track.classList.add('dragging');
+        stopTimer();
+      }, { passive: true });
+      wrap.addEventListener('touchmove', e => {
+        const dx = e.touches[0].clientX - touchStartX;
+        track.style.transform = 'translateX(calc(-' + (current * 100) + '% + ' + dx + 'px))';
+      }, { passive: true });
+      wrap.addEventListener('touchend', e => {
+        track.classList.remove('dragging');
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 50) goTo(dx < 0 ? current + 1 : current - 1, true);
+        else { updateUI(); startTimer(); }
+      }, { passive: true });
+
+      // Pause on hover
+      wrap.addEventListener('mouseenter', stopTimer);
+      wrap.addEventListener('mouseleave', () => { if (!timer) startTimer(); });
+
+      updateUI();
+      if (total > 1) startTimer();
+    });
+  })();
+  </script>
+</body>
+</html>

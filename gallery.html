@@ -128,20 +128,35 @@
     const grid = document.getElementById('gallery-grid');
     const emptyNote = document.getElementById('gallery-empty-note');
 
-    sb.from('gallery_photos').select('*').order('sort_order').order('created_at').then(({ data, error }) => {
-      if (error || !data || !data.length) {
+    Promise.all([
+      sb.from('gallery_projects').select('*').order('sort_order').order('created_at'),
+      sb.from('gallery_photos').select('id, project_id, storage_path, sort_order, created_at').order('sort_order').order('created_at')
+    ]).then(([{ data: projects, error: pErr }, { data: photos }]) => {
+      if (pErr || !projects || !projects.length) {
         emptyNote.style.display = 'block';
         return;
       }
-      grid.innerHTML = data.map((p, i) => {
-        const url = sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl;
+
+      // Build a map: project_id → first photo
+      const coverMap = {};
+      (photos || []).forEach(ph => {
+        if (ph.project_id && !coverMap[ph.project_id]) coverMap[ph.project_id] = ph;
+      });
+
+      grid.innerHTML = projects.map((proj, i) => {
+        const cover = coverMap[proj.id];
+        const coverUrl = cover ? sb.storage.from('gallery').getPublicUrl(cover.storage_path).data.publicUrl : null;
         const cls = i % 2 === 1 ? 'work-item reveal d1' : 'work-item reveal';
-        const meta = [p.category, p.caption].filter(Boolean).join(' · ');
-        return '<a class="' + cls + '" href="contact.html">' +
-          '<div class="art tall" style="background-image:url(' + url + ');background-size:cover;background-position:center"></div>' +
-          '<div class="work-meta"><small>' + (meta || '&nbsp;') + '</small><strong>' + (p.piece_name || '') + '</strong></div>' +
+        const artStyle = coverUrl
+          ? 'background-image:url(' + coverUrl + ');background-size:cover;background-position:center'
+          : '';
+        return '<a class="' + cls + '" href="piece.html?project=' + encodeURIComponent(proj.id) + '">' +
+          '<div class="art tall" style="' + artStyle + '"></div>' +
+          '<div class="work-meta"><strong>' + proj.name + '</strong></div>' +
           '</a>';
       }).join('');
+
+      grid.querySelectorAll('.reveal').forEach(el => { if (typeof revealObserver !== 'undefined') revealObserver.observe(el); });
     });
   })();
   </script>

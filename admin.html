@@ -220,6 +220,98 @@
     /* ── Spinner ── */
     .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Projects Layout ── */
+    .gallery-projects-layout {
+      display: grid; grid-template-columns: 260px 1fr; gap: 1.25rem; align-items: start;
+    }
+    .projects-sidebar {
+      background: var(--admin-card); border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); overflow: hidden;
+    }
+    .projects-sidebar-header {
+      padding: 0.75rem 1rem; border-bottom: 1px solid var(--admin-border);
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--admin-muted);
+    }
+    .project-list-item {
+      padding: 0.7rem 1rem; border-bottom: 1px solid var(--admin-border);
+      cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+      transition: background 0.12s;
+    }
+    .project-list-item:last-child { border-bottom: none; }
+    .project-list-item:hover { background: var(--admin-bg); }
+    .project-list-item.selected { background: #e6f3ee; border-left: 3px solid var(--admin-accent); padding-left: calc(1rem - 3px); }
+    .project-list-name { font-size: 0.875rem; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .project-list-count { font-size: 0.75rem; color: var(--admin-muted); flex-shrink: 0; }
+    .project-list-actions { display: flex; gap: 0.15rem; flex-shrink: 0; opacity: 0; transition: opacity 0.12s; }
+    .project-list-item:hover .project-list-actions,
+    .project-list-item.selected .project-list-actions { opacity: 1; }
+    .btn-icon {
+      background: none; border: none; cursor: pointer; padding: 0.2rem 0.3rem;
+      border-radius: 4px; font-size: 0.75rem; color: var(--admin-muted);
+      transition: background 0.12s, color 0.12s; font-family: inherit;
+    }
+    .btn-icon:hover { background: var(--admin-border); color: var(--admin-text); }
+    .btn-icon.danger:hover { background: var(--admin-danger); color: #fff; }
+    .project-detail {
+      background: var(--admin-card); border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); min-height: 300px;
+    }
+    .project-detail-empty {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 300px; color: var(--admin-muted); font-size: 0.875rem;
+    }
+    .project-detail-header {
+      padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--admin-border);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .project-detail-title { font-size: 1rem; font-weight: 700; flex: 1; }
+    .project-detail-body { padding: 1.25rem; }
+    .project-order-input {
+      width: 48px; padding: 0.2rem 0.35rem; border: 1px solid var(--admin-border);
+      border-radius: 4px; font-size: 0.75rem; font-family: inherit;
+    }
+
+    /* ── Rename inline input ── */
+    .project-rename-input {
+      flex: 1; padding: 0.2rem 0.5rem; border: 1px solid var(--admin-accent);
+      border-radius: 4px; font-size: 0.875rem; font-family: inherit; outline: none;
+    }
+
+    /* ── Availability Panel ── */
+    .avail-section-card {
+      background: var(--admin-card); border: 1px solid var(--admin-border);
+      border-radius: var(--admin-radius); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;
+    }
+    .avail-section-title {
+      font-size: 0.875rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--admin-muted); margin-bottom: 1rem;
+    }
+    .avail-row-fields { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .avail-row-fields .form-group { min-width: 120px; }
+    .avail-table-header {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 100px;
+      gap: 0.75rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--admin-muted);
+      padding: 0 0 0.5rem; border-bottom: 1px solid var(--admin-border); margin-bottom: 0.5rem;
+    }
+    .avail-table-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 100px;
+      gap: 0.75rem; align-items: end; margin-bottom: 0.25rem;
+    }
+    .avail-table-row .form-group { margin-bottom: 0; }
+    .avail-accent-check { display: flex; align-items: center; padding-bottom: 0.65rem; }
+    .avail-accent-check label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+    .avail-setup-banner {
+      background: #fff8e1; border: 1px solid #f0c040; border-radius: var(--admin-radius);
+      padding: 0.9rem 1.1rem; margin-bottom: 1.25rem; font-size: 0.875rem; line-height: 1.5;
+    }
+    .avail-setup-banner a { color: var(--admin-accent); font-weight: 600; }
+    .avail-setup-banner pre {
+      margin-top: 0.75rem; background: #f5f5f5; border-radius: 6px;
+      padding: 0.9rem; font-size: 0.75rem; overflow-x: auto; white-space: pre;
+    }
   </style>
 </head>
 <body>
@@ -252,32 +344,66 @@
     <button class="admin-nav-btn active" onclick="showPanel('gallery')">Gallery Photos</button>
     <button class="admin-nav-btn" onclick="showPanel('process')">Process Photos</button>
     <button class="admin-nav-btn" onclick="showPanel('faqs')">FAQs</button>
+    <button class="admin-nav-btn" onclick="showPanel('availability')">Availability</button>
   </nav>
 
   <div class="admin-content">
 
     <!-- Gallery Panel -->
     <div class="admin-panel active" id="panel-gallery">
+
+      <div id="gallery-projects-setup" class="avail-setup-banner" style="display:none">
+        <strong>Projects table not set up yet.</strong> Run this SQL once in your
+        <a href="https://supabase.com/dashboard/project/sfxubyyetfetfxbghuzo/sql/new" target="_blank">Supabase SQL editor</a>, then refresh.
+        <button class="btn-ghost" style="margin-left:0.75rem;font-size:0.75rem" onclick="copyProjectsSql()">Copy SQL</button>
+        <pre id="projects-setup-sql" style="display:none">-- Run once to enable project-based gallery
+create table if not exists gallery_projects (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  sort_order int not null default 0,
+  created_at timestamptz default now()
+);
+alter table gallery_projects enable row level security;
+create policy "public read" on gallery_projects for select using (true);
+create policy "auth all" on gallery_projects for all using (auth.role() = 'authenticated');
+
+alter table gallery_photos add column if not exists project_id uuid references gallery_projects(id) on delete set null;</pre>
+      </div>
+
       <div class="panel-header">
         <div>
-          <h2>Gallery Photos</h2>
-          <p>Photos appear on The Work page and the homepage preview (top 2 by order).</p>
+          <h2>Gallery Projects</h2>
+          <p>Organize your work into projects — each gets its own gallery page.</p>
         </div>
+        <button class="btn-primary" onclick="openNewProjectModal()">+ New Project</button>
       </div>
 
-      <div class="upload-zone" id="gallery-drop" onclick="document.getElementById('gallery-file-input').click()">
-        <input type="file" id="gallery-file-input" accept="image/jpeg,image/png,image/webp" multiple>
-        <div class="upload-zone-icon">📷</div>
-        <p><strong>Click to upload</strong> or drag and drop</p>
-        <p>JPG, PNG, WebP — max 10MB per file</p>
-        <div class="upload-progress" id="gallery-upload-progress">
-          <div class="upload-bar-wrap"><div class="upload-bar-fill" id="gallery-bar"></div></div>
-          <div class="upload-status" id="gallery-upload-status">Uploading…</div>
+      <div class="gallery-projects-layout">
+        <!-- Left: project list -->
+        <div class="projects-sidebar">
+          <div class="projects-sidebar-header">Projects</div>
+          <div id="projects-list"><div class="gallery-empty" style="border:none;padding:1.5rem">Loading…</div></div>
         </div>
-      </div>
 
-      <div class="gallery-grid" id="gallery-grid">
-        <div class="gallery-empty">Loading…</div>
+        <!-- Right: selected project detail -->
+        <div class="project-detail" id="project-detail">
+          <div class="project-detail-empty" id="project-detail-empty">← Select a project to manage its photos</div>
+          <div id="project-detail-content" style="display:none">
+            <div class="project-detail-header">
+              <span class="project-detail-title" id="selected-project-name"></span>
+              <button class="btn-ghost" style="font-size:0.8rem" onclick="openRenameProject()">Rename</button>
+            </div>
+            <div class="project-detail-body">
+              <div class="upload-zone" id="project-photo-drop" onclick="document.getElementById('project-photo-input').click()">
+                <input type="file" id="project-photo-input" accept="image/jpeg,image/png,image/webp" multiple>
+                <div class="upload-zone-icon">📷</div>
+                <p><strong>Click to upload</strong> or drag and drop photos into this project</p>
+                <p>JPG, PNG, WebP — max 10MB per file</p>
+              </div>
+              <div class="gallery-grid" id="project-photos-grid"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -291,6 +417,100 @@
       </div>
       <div class="stage-list" id="stage-list">
         <div class="gallery-empty">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Availability Panel -->
+    <div class="admin-panel" id="panel-availability">
+      <div class="panel-header">
+        <div>
+          <h2>Commission Availability</h2>
+          <p>Controls the booking card on the home page and the Commissions page.</p>
+        </div>
+        <button class="btn-primary" onclick="saveAvailability()">Save changes</button>
+      </div>
+
+      <div id="avail-load-error" class="avail-setup-banner" style="display:none">
+        <strong>Table not set up yet.</strong> Run this SQL once in your
+        <a href="https://supabase.com/dashboard/project/sfxubyyetfetfxbghuzo/sql/new" target="_blank">Supabase SQL editor</a>, then refresh this page.
+        <button class="btn-ghost" style="margin-left:0.75rem;font-size:0.75rem" onclick="copySetupSql()">Copy SQL</button>
+        <pre id="setup-sql" style="display:none">create table if not exists commission_card (
+  id int primary key default 1,
+  booking_month text not null default 'September 2026',
+  slots_filled int not null default 2,
+  slots_total int not null default 3,
+  slots_note text not null default '2 of 3 slots open. Large conference builds reserve two slots.',
+  row1_type text not null default 'Coffee table',
+  row1_hours text not null default '~40 hrs',
+  row1_weeks text not null default '4–6 weeks',
+  row1_accent boolean not null default false,
+  row2_type text not null default 'Dining table',
+  row2_hours text not null default '80–100 hrs',
+  row2_weeks text not null default '8–10 weeks',
+  row2_accent boolean not null default true,
+  row3_type text not null default 'Conference table',
+  row3_hours text not null default '150+ hrs',
+  row3_weeks text not null default '10–14 weeks',
+  row3_accent boolean not null default false,
+  updated_at timestamptz default now()
+);
+insert into commission_card (id) values (1) on conflict do nothing;
+alter table commission_card enable row level security;
+create policy "public read" on commission_card for select using (true);
+create policy "auth update" on commission_card for update using (auth.role() = 'authenticated');</pre>
+      </div>
+
+      <div id="avail-form">
+        <div class="avail-section-card">
+          <h3 class="avail-section-title">Booking window</h3>
+          <div class="avail-row-fields">
+            <div class="form-group" style="flex:2">
+              <label>Date label</label>
+              <input type="text" id="av-month" placeholder="e.g. September 2026">
+            </div>
+            <div class="form-group" style="flex:1">
+              <label>Slots filled</label>
+              <input type="number" id="av-filled" min="0" max="10" placeholder="2">
+            </div>
+            <div class="form-group" style="flex:1">
+              <label>Total slots</label>
+              <input type="number" id="av-total" min="1" max="10" placeholder="3">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Slots note (shown under the bars)</label>
+            <input type="text" id="av-note" placeholder="e.g. 2 of 3 slots open. Large conference builds reserve two slots.">
+          </div>
+        </div>
+
+        <div class="avail-section-card">
+          <h3 class="avail-section-title">Build type rows</h3>
+          <div class="avail-table-header">
+            <span>Type</span><span>Hours</span><span>Weeks</span><span>Highlight hrs?</span>
+          </div>
+          <div class="avail-table-row">
+            <div class="form-group"><input type="text" id="av-r1-type" placeholder="Coffee table"></div>
+            <div class="form-group"><input type="text" id="av-r1-hours" placeholder="~40 hrs"></div>
+            <div class="form-group"><input type="text" id="av-r1-weeks" placeholder="4–6 weeks"></div>
+            <div class="avail-accent-check"><label><input type="checkbox" id="av-r1-accent"> Accent</label></div>
+          </div>
+          <div class="avail-table-row">
+            <div class="form-group"><input type="text" id="av-r2-type" placeholder="Dining table"></div>
+            <div class="form-group"><input type="text" id="av-r2-hours" placeholder="80–100 hrs"></div>
+            <div class="form-group"><input type="text" id="av-r2-weeks" placeholder="8–10 weeks"></div>
+            <div class="avail-accent-check"><label><input type="checkbox" id="av-r2-accent"> Accent</label></div>
+          </div>
+          <div class="avail-table-row">
+            <div class="form-group"><input type="text" id="av-r3-type" placeholder="Conference table"></div>
+            <div class="form-group"><input type="text" id="av-r3-hours" placeholder="150+ hrs"></div>
+            <div class="form-group"><input type="text" id="av-r3-weeks" placeholder="10–14 weeks"></div>
+            <div class="avail-accent-check"><label><input type="checkbox" id="av-r3-accent"> Accent</label></div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:1rem">
+          <button class="btn-primary" onclick="saveAvailability()">Save changes</button>
+        </div>
       </div>
     </div>
 
@@ -331,33 +551,64 @@
   </div>
 </div>
 
+<!-- ── New Project Modal ────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="new-project-modal">
+  <div class="modal">
+    <h3>New Project</h3>
+    <div class="form-group">
+      <label>Project name</label>
+      <input type="text" id="new-project-name" placeholder="e.g. Walnut River Dining Table">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeNewProjectModal()">Cancel</button>
+      <button class="btn-primary" onclick="createProject()">Create Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Rename Project Modal ──────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="rename-project-modal">
+  <div class="modal">
+    <h3>Rename Project</h3>
+    <div class="form-group">
+      <label>Project name</label>
+      <input type="text" id="rename-project-name" placeholder="Project name">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeRenameProjectModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveRenameProject()">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── Upload Details Modal ─────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="upload-modal">
   <div class="modal">
     <h3>Photo details</h3>
     <img class="modal-preview" id="modal-preview" alt="">
     <div class="form-group">
-      <label>Piece name</label>
-      <input type="text" id="modal-piece-name" placeholder="e.g. Walnut River Dining Table">
-    </div>
-    <div class="form-group">
-      <label>Category</label>
-      <select id="modal-category">
-        <option value="">— none —</option>
-        <option value="Dining">Dining</option>
-        <option value="Coffee &amp; Sofa">Coffee &amp; Sofa</option>
-        <option value="Mantel &amp; Wall">Mantel &amp; Wall</option>
-        <option value="Conference">Conference</option>
-        <option value="Other">Other</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Caption</label>
-      <input type="text" id="modal-caption" placeholder="Short description (optional)">
+      <label>Caption <span style="font-weight:400;text-transform:none">(optional)</span></label>
+      <input type="text" id="modal-caption" placeholder="Short description">
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeUploadModal()">Cancel</button>
       <button class="btn-primary" id="modal-save-btn" onclick="savePhoto()">Save &amp; upload</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Edit Gallery Photo Modal ────────────────────────────────────────────── -->
+<div class="edit-modal-overlay" id="photo-edit-modal">
+  <div class="modal">
+    <h3>Edit photo</h3>
+    <input type="hidden" id="edit-photo-id">
+    <div class="form-group">
+      <label>Caption <span style="font-weight:400;text-transform:none">(optional)</span></label>
+      <input type="text" id="edit-photo-caption" placeholder="Short description">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeEditPhoto()">Cancel</button>
+      <button class="btn-primary" onclick="saveEditPhoto()">Save changes</button>
     </div>
   </div>
 </div>
@@ -395,6 +646,10 @@ const STAGE_NAMES = ['Finding the Slab','The Layout','The Pour','CNC Flattening'
 let pendingFiles = [];
 let currentFileIndex = 0;
 let currentFaqPage = 'contact';
+let selectedProjectId = null;
+let selectedProjectName = '';
+let allProjects = [];
+let photoCounts = {};
 
 // ── Auth ────────────────────────────────────────────────────────────────────
 async function signIn() {
@@ -434,9 +689,10 @@ async function checkSession() {
 function showAdmin() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('admin-screen').style.display = 'block';
-  loadGallery();
+  loadProjects();
   loadProcessPhotos();
   loadFaqs();
+  loadAvailability();
 }
 
 // ── Navigation ───────────────────────────────────────────────────────────────
@@ -457,42 +713,175 @@ function showToast(msg, isError) {
   toastTimer = setTimeout(() => t.className = 'toast', 3000);
 }
 
-// ── Gallery ──────────────────────────────────────────────────────────────────
-async function loadGallery() {
-  const grid = document.getElementById('gallery-grid');
-  const { data, error } = await sb.from('gallery_photos').select('*').order('sort_order').order('created_at');
+// ── Projects ─────────────────────────────────────────────────────────────────
+async function loadProjects() {
+  const listEl = document.getElementById('projects-list');
+
+  // Check if gallery_projects table exists
+  const { data: projects, error } = await sb.from('gallery_projects').select('*').order('sort_order').order('created_at');
+  if (error) {
+    document.getElementById('gallery-projects-setup').style.display = 'block';
+    document.getElementById('projects-setup-sql').style.display = 'block';
+    listEl.innerHTML = '<div class="gallery-empty" style="border:none;padding:1.5rem">Set up the table above first.</div>';
+    return;
+  }
+  document.getElementById('gallery-projects-setup').style.display = 'none';
+
+  // Also count photos per project
+  const { data: photos } = await sb.from('gallery_photos').select('id, project_id');
+  photoCounts = {};
+  (photos || []).forEach(p => {
+    if (p.project_id) photoCounts[p.project_id] = (photoCounts[p.project_id] || 0) + 1;
+  });
+
+  allProjects = projects || [];
+
+  if (!allProjects.length) {
+    listEl.innerHTML = '<div class="gallery-empty" style="border:none;padding:1.5rem">No projects yet — create one above.</div>';
+    return;
+  }
+
+  listEl.innerHTML = allProjects.map(p => `
+    <div class="project-list-item${selectedProjectId === p.id ? ' selected' : ''}" id="pli-${p.id}" onclick="selectProject('${escJs(p.id)}', '${escJs(p.name)}')">
+      <span class="project-list-name">${escHtml(p.name)}</span>
+      <span class="project-list-count">${photoCounts[p.id] || 0} photo${(photoCounts[p.id] || 0) !== 1 ? 's' : ''}</span>
+      <span class="project-list-actions" onclick="event.stopPropagation()">
+        <span style="font-size:0.7rem;color:var(--admin-muted);margin-right:0.2rem">#<input type="number" value="${p.sort_order ?? 0}" min="0" class="project-order-input" title="Display order" onchange="updateProjectOrder('${p.id}', this.value)" onclick="event.stopPropagation()"></span>
+        <button class="btn-icon danger" title="Delete project" onclick="deleteProject('${escJs(p.id)}', '${escJs(p.name)}')">✕</button>
+      </span>
+    </div>
+  `).join('');
+
+  // Re-select current project if still in list
+  if (selectedProjectId && allProjects.find(p => p.id === selectedProjectId)) {
+    loadProjectPhotos(selectedProjectId);
+  }
+}
+
+function selectProject(id, name) {
+  selectedProjectId = id;
+  selectedProjectName = name;
+  document.querySelectorAll('.project-list-item').forEach(el => el.classList.remove('selected'));
+  document.getElementById('pli-' + id)?.classList.add('selected');
+  document.getElementById('project-detail-empty').style.display = 'none';
+  document.getElementById('project-detail-content').style.display = 'block';
+  document.getElementById('selected-project-name').textContent = name;
+  loadProjectPhotos(id);
+}
+
+async function loadProjectPhotos(projectId) {
+  const grid = document.getElementById('project-photos-grid');
+  grid.innerHTML = '<div class="gallery-empty" style="border:none">Loading…</div>';
+  const { data, error } = await sb.from('gallery_photos').select('*').eq('project_id', projectId).order('sort_order').order('created_at');
   if (error) { grid.innerHTML = '<div class="gallery-empty">Error loading photos.</div>'; return; }
-  if (!data.length) { grid.innerHTML = '<div class="gallery-empty">No photos yet — upload your first one above.</div>'; return; }
+  if (!data || !data.length) { grid.innerHTML = '<div class="gallery-empty" style="border:none">No photos yet — upload some above.</div>'; return; }
   grid.innerHTML = data.map(p => {
     const url = sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl;
     return `<div class="gallery-item" id="gitem-${p.id}">
-      <img class="gallery-thumb" src="${url}" alt="${p.piece_name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img class="gallery-thumb" src="${url}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="gallery-thumb-placeholder" style="display:none">No preview</div>
       <div class="gallery-item-body">
-        <div class="gallery-item-name">${p.piece_name || '(untitled)'}</div>
-        <div class="gallery-item-meta">${p.category || ''}${p.caption ? ' · ' + p.caption : ''}</div>
+        <div class="gallery-item-meta" style="font-size:0.75rem;color:var(--admin-muted)">${escHtml(p.caption || '')}</div>
       </div>
-      <div class="gallery-item-footer">
-        <button class="btn-danger" onclick="deleteGalleryPhoto('${p.id}', '${p.storage_path}')">Remove</button>
+      <div class="gallery-item-footer" style="gap:0.5rem;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.75rem;color:var(--admin-muted);">Order: <input type="number" value="${p.sort_order ?? 0}" min="0" style="width:52px;padding:0.2rem 0.4rem;border:1px solid var(--admin-border);border-radius:4px;font-size:0.75rem;font-family:inherit;" onchange="updatePhotoSortOrder('${p.id}', this.value)"></span>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn-ghost" onclick="openEditPhoto('${p.id}','${escJs(p.caption)}')">Edit</button>
+          <button class="btn-danger" onclick="deleteGalleryPhoto('${p.id}', '${escJs(p.storage_path)}')">Remove</button>
+        </div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── File drop zone setup ─────────────────────────────────────────────────────
-const dropZone = document.getElementById('gallery-drop');
-const fileInput = document.getElementById('gallery-file-input');
-
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('drag-over');
-  handleFiles(Array.from(e.dataTransfer.files));
+// ── New Project Modal ─────────────────────────────────────────────────────────
+function openNewProjectModal() {
+  document.getElementById('new-project-name').value = '';
+  document.getElementById('new-project-modal').classList.add('open');
+  setTimeout(() => document.getElementById('new-project-name').focus(), 50);
+}
+function closeNewProjectModal() {
+  document.getElementById('new-project-modal').classList.remove('open');
+}
+document.getElementById('new-project-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') createProject();
+  if (e.key === 'Escape') closeNewProjectModal();
 });
-fileInput.addEventListener('change', () => handleFiles(Array.from(fileInput.files)));
+async function createProject() {
+  const name = document.getElementById('new-project-name').value.trim();
+  if (!name) { showToast('Enter a project name.', true); return; }
+  const maxOrder = allProjects.reduce((m, p) => Math.max(m, p.sort_order || 0), 0);
+  const { data, error } = await sb.from('gallery_projects').insert({ name, sort_order: maxOrder + 1 }).select().single();
+  if (error) { showToast('Error: ' + error.message, true); return; }
+  closeNewProjectModal();
+  showToast('Project created!');
+  await loadProjects();
+  if (data) selectProject(data.id, data.name);
+}
 
+// ── Rename Project Modal ──────────────────────────────────────────────────────
+function openRenameProject() {
+  document.getElementById('rename-project-name').value = selectedProjectName;
+  document.getElementById('rename-project-modal').classList.add('open');
+  setTimeout(() => document.getElementById('rename-project-name').focus(), 50);
+}
+function closeRenameProjectModal() {
+  document.getElementById('rename-project-modal').classList.remove('open');
+}
+document.getElementById('rename-project-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveRenameProject();
+  if (e.key === 'Escape') closeRenameProjectModal();
+});
+async function saveRenameProject() {
+  const name = document.getElementById('rename-project-name').value.trim();
+  if (!name || !selectedProjectId) return;
+  const { error } = await sb.from('gallery_projects').update({ name }).eq('id', selectedProjectId);
+  if (error) { showToast('Error: ' + error.message, true); return; }
+  selectedProjectName = name;
+  document.getElementById('selected-project-name').textContent = name;
+  closeRenameProjectModal();
+  showToast('Project renamed!');
+  loadProjects();
+}
+
+async function deleteProject(id, name) {
+  if (!confirm(`Delete project "${name}"? Photos in this project will become unassigned (not deleted).`)) return;
+  const { error } = await sb.from('gallery_projects').delete().eq('id', id);
+  if (error) { showToast('Error: ' + error.message, true); return; }
+  if (selectedProjectId === id) {
+    selectedProjectId = null;
+    document.getElementById('project-detail-empty').style.display = 'flex';
+    document.getElementById('project-detail-content').style.display = 'none';
+  }
+  showToast('Project deleted.');
+  loadProjects();
+}
+
+async function updateProjectOrder(id, value) {
+  const sort_order = parseInt(value) || 0;
+  const { error } = await sb.from('gallery_projects').update({ sort_order }).eq('id', id);
+  if (error) showToast('Could not update order: ' + error.message, true);
+  else showToast('Order saved!');
+}
+
+// ── Photo Upload (project-scoped) ─────────────────────────────────────────────
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+const projectDropZone = document.getElementById('project-photo-drop');
+const projectFileInput = document.getElementById('project-photo-input');
+
+projectDropZone.addEventListener('dragover', e => { e.preventDefault(); projectDropZone.classList.add('drag-over'); });
+projectDropZone.addEventListener('dragleave', () => projectDropZone.classList.remove('drag-over'));
+projectDropZone.addEventListener('drop', e => {
+  e.preventDefault(); projectDropZone.classList.remove('drag-over');
+  if (!selectedProjectId) { showToast('Select a project first.', true); return; }
+  handleFiles(Array.from(e.dataTransfer.files));
+});
+projectFileInput.addEventListener('change', () => {
+  if (!selectedProjectId) { showToast('Select a project first.', true); return; }
+  handleFiles(Array.from(projectFileInput.files));
+});
 
 function handleFiles(files) {
   const typed = files.filter(f => ALLOWED_TYPES.has(f.type));
@@ -509,9 +898,7 @@ function openUploadModal(file) {
   const reader = new FileReader();
   reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
   reader.readAsDataURL(file);
-  document.getElementById('modal-piece-name').value = '';
   document.getElementById('modal-caption').value = '';
-  document.getElementById('modal-category').value = '';
   document.getElementById('modal-save-btn').disabled = false;
   document.getElementById('modal-save-btn').textContent = 'Save & upload';
   document.getElementById('upload-modal').classList.add('open');
@@ -520,6 +907,7 @@ function openUploadModal(file) {
 function closeUploadModal() {
   document.getElementById('upload-modal').classList.remove('open');
   pendingFiles = [];
+  projectFileInput.value = '';
 }
 
 async function savePhoto() {
@@ -533,18 +921,21 @@ async function savePhoto() {
   const { error: upErr } = await sb.storage.from('gallery').upload(path, file, { upsert: false });
   if (upErr) { showToast('Upload failed: ' + upErr.message, true); btn.disabled = false; btn.textContent = 'Save & upload'; return; }
 
-  const pieceName = document.getElementById('modal-piece-name').value.trim();
   const caption = document.getElementById('modal-caption').value.trim();
-  const category = document.getElementById('modal-category').value;
-
   const { error: dbErr } = await sb.from('gallery_photos').insert({
-    storage_path: path, piece_name: pieceName, caption, category, sort_order: 0
+    storage_path: path, caption, sort_order: 0, project_id: selectedProjectId
   });
-  if (dbErr) { showToast('Saved file but DB insert failed: ' + dbErr.message, true); }
+  if (dbErr) { showToast('File saved but DB insert failed: ' + dbErr.message, true); }
 
-  closeUploadModal();
-  showToast('Photo uploaded!');
-  loadGallery();
+  currentFileIndex++;
+  if (currentFileIndex < pendingFiles.length) {
+    openUploadModal(pendingFiles[currentFileIndex]);
+  } else {
+    closeUploadModal();
+    showToast(pendingFiles.length > 1 ? `${pendingFiles.length} photos uploaded!` : 'Photo uploaded!');
+    loadProjectPhotos(selectedProjectId);
+    loadProjects();
+  }
 }
 
 async function deleteGalleryPhoto(id, storagePath) {
@@ -553,8 +944,37 @@ async function deleteGalleryPhoto(id, storagePath) {
   await sb.from('gallery_photos').delete().eq('id', id);
   document.getElementById('gitem-' + id)?.remove();
   showToast('Photo removed.');
-  const grid = document.getElementById('gallery-grid');
-  if (!grid.children.length) grid.innerHTML = '<div class="gallery-empty">No photos yet — upload your first one above.</div>';
+  loadProjects();
+  const grid = document.getElementById('project-photos-grid');
+  if (!grid.querySelector('.gallery-item')) {
+    grid.innerHTML = '<div class="gallery-empty" style="border:none">No photos yet — upload some above.</div>';
+  }
+}
+
+// ── Edit photo ────────────────────────────────────────────────────────────────
+function openEditPhoto(id, caption) {
+  document.getElementById('edit-photo-id').value = id;
+  document.getElementById('edit-photo-caption').value = caption;
+  document.getElementById('photo-edit-modal').classList.add('open');
+}
+function closeEditPhoto() {
+  document.getElementById('photo-edit-modal').classList.remove('open');
+}
+async function saveEditPhoto() {
+  const id = document.getElementById('edit-photo-id').value;
+  const caption = document.getElementById('edit-photo-caption').value.trim();
+  const { error } = await sb.from('gallery_photos').update({ caption }).eq('id', id);
+  if (error) { showToast('Save failed: ' + error.message, true); return; }
+  closeEditPhoto();
+  showToast('Photo updated!');
+  loadProjectPhotos(selectedProjectId);
+}
+
+async function updatePhotoSortOrder(id, value) {
+  const sort_order = parseInt(value) || 0;
+  const { error } = await sb.from('gallery_photos').update({ sort_order }).eq('id', id);
+  if (error) showToast('Could not update order: ' + error.message, true);
+  else showToast('Order saved!');
 }
 
 // ── Process Photos ────────────────────────────────────────────────────────────
@@ -680,7 +1100,85 @@ async function saveFaqEdit() {
 }
 
 function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escJs(s) {
+  return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+function copyProjectsSql() {
+  const sql = document.getElementById('projects-setup-sql').textContent;
+  navigator.clipboard.writeText(sql).then(() => showToast('SQL copied!')).catch(() => showToast('Copy failed', true));
+}
+
+// ── Availability ──────────────────────────────────────────────────────────────
+const AVAIL_DEFAULTS = {
+  booking_month: 'September 2026', slots_filled: 2, slots_total: 3,
+  slots_note: '2 of 3 slots open. Large conference builds reserve two slots.',
+  row1_type: 'Coffee table',    row1_hours: '~40 hrs',    row1_weeks: '4–6 weeks',   row1_accent: false,
+  row2_type: 'Dining table',    row2_hours: '80–100 hrs', row2_weeks: '8–10 weeks',  row2_accent: true,
+  row3_type: 'Conference table',row3_hours: '150+ hrs',   row3_weeks: '10–14 weeks', row3_accent: false,
+};
+
+async function loadAvailability() {
+  const { data, error } = await sb.from('commission_card').select('*').eq('id', 1).single();
+  if (error) {
+    document.getElementById('avail-load-error').style.display = 'block';
+    document.getElementById('setup-sql').style.display = 'block';
+    fillAvailForm(AVAIL_DEFAULTS);
+    return;
+  }
+  document.getElementById('avail-load-error').style.display = 'none';
+  fillAvailForm(data);
+}
+
+function fillAvailForm(d) {
+  document.getElementById('av-month').value  = d.booking_month  ?? '';
+  document.getElementById('av-filled').value = d.slots_filled   ?? 2;
+  document.getElementById('av-total').value  = d.slots_total    ?? 3;
+  document.getElementById('av-note').value   = d.slots_note     ?? '';
+  document.getElementById('av-r1-type').value  = d.row1_type  ?? '';
+  document.getElementById('av-r1-hours').value = d.row1_hours ?? '';
+  document.getElementById('av-r1-weeks').value = d.row1_weeks ?? '';
+  document.getElementById('av-r1-accent').checked = !!d.row1_accent;
+  document.getElementById('av-r2-type').value  = d.row2_type  ?? '';
+  document.getElementById('av-r2-hours').value = d.row2_hours ?? '';
+  document.getElementById('av-r2-weeks').value = d.row2_weeks ?? '';
+  document.getElementById('av-r2-accent').checked = !!d.row2_accent;
+  document.getElementById('av-r3-type').value  = d.row3_type  ?? '';
+  document.getElementById('av-r3-hours').value = d.row3_hours ?? '';
+  document.getElementById('av-r3-weeks').value = d.row3_weeks ?? '';
+  document.getElementById('av-r3-accent').checked = !!d.row3_accent;
+}
+
+async function saveAvailability() {
+  const payload = {
+    booking_month: document.getElementById('av-month').value.trim(),
+    slots_filled:  parseInt(document.getElementById('av-filled').value) || 0,
+    slots_total:   parseInt(document.getElementById('av-total').value)  || 3,
+    slots_note:    document.getElementById('av-note').value.trim(),
+    row1_type:  document.getElementById('av-r1-type').value.trim(),
+    row1_hours: document.getElementById('av-r1-hours').value.trim(),
+    row1_weeks: document.getElementById('av-r1-weeks').value.trim(),
+    row1_accent: document.getElementById('av-r1-accent').checked,
+    row2_type:  document.getElementById('av-r2-type').value.trim(),
+    row2_hours: document.getElementById('av-r2-hours').value.trim(),
+    row2_weeks: document.getElementById('av-r2-weeks').value.trim(),
+    row2_accent: document.getElementById('av-r2-accent').checked,
+    row3_type:  document.getElementById('av-r3-type').value.trim(),
+    row3_hours: document.getElementById('av-r3-hours').value.trim(),
+    row3_weeks: document.getElementById('av-r3-weeks').value.trim(),
+    row3_accent: document.getElementById('av-r3-accent').checked,
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await sb.from('commission_card').upsert({ id: 1, ...payload });
+  if (error) { showToast('Save failed: ' + error.message, true); return; }
+  showToast('Availability saved!');
+}
+
+function copySetupSql() {
+  const sql = document.getElementById('setup-sql').textContent;
+  navigator.clipboard.writeText(sql).then(() => showToast('SQL copied!')).catch(() => showToast('Copy failed', true));
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

@@ -189,6 +189,57 @@
     </div>
   </section>
 
+  <!-- ── Commissions / Availability ───────────────────────────────────── -->
+  <section class="commissions-section" id="availability">
+    <div class="container">
+      <div class="commissions-grid">
+
+        <!-- Left: copy -->
+        <div class="commissions-left">
+          <span class="eyebrow reveal">Commissions</span>
+          <h2 class="display-lg reveal d1">Built one at a time.<br>Booked the same way.</h2>
+          <p class="lede reveal d2">Every table is made to order in a shop that takes on a few pieces at once — which is exactly why they turn out the way they do. Current builds include a pair of book-matched conference tables that will meet end-to-end at <span class="commissions-accent">28&nbsp;feet</span>.</p>
+          <blockquote class="commissions-quote reveal d3">
+            Architects and designers — we spec into commercial and residential projects. <a href="contact.html#commission-form">Start a trade inquiry &rarr;</a>
+          </blockquote>
+        </div>
+
+        <!-- Right: booking card -->
+        <div class="commissions-card reveal reveal-right d2">
+          <div class="cc-header">
+            <span class="cc-booking-badge"><span class="cc-dot"></span>NOW BOOKING</span>
+            <span id="cc-month">September 2026</span>
+          </div>
+          <div id="cc-bars" class="cc-bars">
+            <div class="cc-bar cc-bar-filled"></div>
+            <div class="cc-bar cc-bar-filled"></div>
+            <div class="cc-bar cc-bar-empty"></div>
+          </div>
+          <p class="cc-slots-note" id="cc-slots-note">2 of 3 slots open. Large conference builds reserve two slots.</p>
+          <div class="cc-table" id="cc-table">
+            <div class="cc-row">
+              <span class="cc-type">Coffee table</span>
+              <span class="cc-hours">~40&nbsp;hrs</span>
+              <span class="cc-weeks">4–6 weeks</span>
+            </div>
+            <div class="cc-row">
+              <span class="cc-type">Dining table</span>
+              <span class="cc-hours cc-hours-accent">80–100&nbsp;hrs</span>
+              <span class="cc-weeks">8–10 weeks</span>
+            </div>
+            <div class="cc-row">
+              <span class="cc-type">Conference table</span>
+              <span class="cc-hours">150+&nbsp;hrs</span>
+              <span class="cc-weeks">10–14 weeks</span>
+            </div>
+          </div>
+          <p class="cc-footer-note">Availability updates come straight from the shop.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <section class="tight">
     <div class="container">
       <div class="cta-band reveal">
@@ -236,6 +287,39 @@
     const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     const grid = document.getElementById('home-gallery-grid');
     if (!grid) return;
+    // Commission availability card
+    sb.from('commission_card').select('*').eq('id', 1).single().then(({ data }) => {
+      if (!data) return;
+      const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const monthEl = document.getElementById('cc-month');
+      if (monthEl && data.booking_month) monthEl.textContent = data.booking_month;
+      const barsEl = document.getElementById('cc-bars');
+      if (barsEl) {
+        const total = Math.max(1, data.slots_total || 3);
+        const filled = Math.min(data.slots_filled || 0, total);
+        barsEl.innerHTML = Array.from({length: total}, (_, i) =>
+          '<div class="cc-bar ' + (i < filled ? 'cc-bar-filled' : 'cc-bar-empty') + '"></div>'
+        ).join('');
+      }
+      const noteEl = document.getElementById('cc-slots-note');
+      if (noteEl && data.slots_note) noteEl.textContent = data.slots_note;
+      const tableEl = document.getElementById('cc-table');
+      if (tableEl) {
+        const rows = [
+          { type: data.row1_type, hours: data.row1_hours, weeks: data.row1_weeks, accent: data.row1_accent },
+          { type: data.row2_type, hours: data.row2_hours, weeks: data.row2_weeks, accent: data.row2_accent },
+          { type: data.row3_type, hours: data.row3_hours, weeks: data.row3_weeks, accent: data.row3_accent },
+        ].filter(r => r.type);
+        tableEl.innerHTML = rows.map(r =>
+          '<div class="cc-row">' +
+            '<span class="cc-type">' + esc(r.type) + '</span>' +
+            '<span class="cc-hours' + (r.accent ? ' cc-hours-accent' : '') + '">' + esc(r.hours) + '</span>' +
+            '<span class="cc-weeks">' + esc(r.weeks) + '</span>' +
+          '</div>'
+        ).join('');
+      }
+    });
+
     sb.from('gallery_photos').select('*').order('sort_order').order('created_at').limit(2).then(({ data }) => {
       if (!data || !data.length) return;
       grid.innerHTML = data.map((p, i) => {
@@ -247,6 +331,7 @@
           '<div class="work-meta"><small>' + (meta || '&nbsp;') + '</small><strong>' + (p.piece_name || '') + '</strong></div>' +
           '</a>';
       }).join('');
+      grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     });
   })();
   </script>
