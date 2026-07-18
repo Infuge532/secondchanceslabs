@@ -37,40 +37,31 @@
   </header>
 
   <!-- Project grid -->
-  <section class="tight" id="gallery-section">
+  <section class="tight">
     <div class="container">
       <div class="work-grid" id="gallery-grid"></div>
       <p class="form-note center" id="gallery-empty-note" style="margin-top:2rem;display:none;">Photography session in progress — photos coming soon.</p>
     </div>
   </section>
 
-  <!-- Inline project view (hidden until a card is clicked) -->
-  <section id="project-view" style="display:none;">
-    <div class="container" style="padding-top:2rem;">
-      <button class="piece-back" id="project-back" style="background:none;border:none;cursor:pointer;font:inherit;">&larr; All Work</button>
-      <h2 class="display-lg" id="project-view-title" style="margin:1.5rem 0 2.5rem;"></h2>
-    </div>
-
-    <!-- Large photo strip -->
-    <div id="project-photos" class="project-photo-strip"></div>
-
-    <div class="container" style="padding-top:3rem;padding-bottom:4rem;">
-      <div class="cta-band reveal">
-        <span class="eyebrow" style="color:var(--sage);">Want One Like This?</span>
-        <h2 class="display-lg">Commission a Piece<br><em class="display-italic">Built Just for You.</em></h2>
-        <p>Tell us the size, the species, the color of the river — or just the room it needs to live in.</p>
-        <a class="btn btn-cream" href="contact.html">Start a Commission</a>
+  <!-- Project popup modal -->
+  <div id="proj-modal" aria-modal="true" role="dialog" aria-label="Project photos">
+    <div id="proj-modal-inner">
+      <div id="proj-modal-header">
+        <span id="proj-modal-title"></span>
+        <button id="proj-modal-close" aria-label="Close">&times;</button>
       </div>
+      <div id="proj-modal-grid"></div>
     </div>
-  </section>
+  </div>
 
-  <!-- Lightbox overlay -->
-  <div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;display:none;align-items:center;justify-content:center;">
-    <button id="lb-close" aria-label="Close" style="position:absolute;top:1.25rem;right:1.5rem;background:none;border:none;color:#fff;font-size:2rem;cursor:pointer;line-height:1;">&times;</button>
-    <button id="lb-prev" aria-label="Previous" style="position:absolute;left:1rem;background:none;border:none;color:#fff;font-size:2.5rem;cursor:pointer;padding:.5rem 1rem;opacity:.7;">&#8592;</button>
-    <img id="lb-img" src="" alt="" style="max-width:90vw;max-height:88vh;object-fit:contain;display:block;border-radius:4px;">
-    <button id="lb-next" aria-label="Next" style="position:absolute;right:1rem;background:none;border:none;color:#fff;font-size:2.5rem;cursor:pointer;padding:.5rem 1rem;opacity:.7;">&#8594;</button>
-    <div id="lb-counter" style="position:absolute;bottom:1.25rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:.85rem;letter-spacing:.08em;"></div>
+  <!-- Single-photo lightbox -->
+  <div id="lightbox" aria-modal="true" role="dialog" aria-label="Photo viewer">
+    <button id="lb-close" aria-label="Close">&times;</button>
+    <button id="lb-prev" aria-label="Previous">&#8592;</button>
+    <img id="lb-img" src="" alt="">
+    <button id="lb-next" aria-label="Next">&#8594;</button>
+    <div id="lb-counter"></div>
   </div>
 
   <section>
@@ -108,7 +99,7 @@
     </div>
   </section>
 
-  <section class="tight" id="gallery-cta" style="display:none;">
+  <section class="tight">
     <div class="container">
       <div class="cta-band reveal">
         <span class="eyebrow" style="color:var(--sage);">Your Piece Next</span>
@@ -153,16 +144,16 @@
   <script>
   (function(){
     const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-    const grid        = document.getElementById('gallery-grid');
-    const emptyNote   = document.getElementById('gallery-empty-note');
-    const gallerySection = document.getElementById('gallery-section');
-    const projectView = document.getElementById('project-view');
-    const projectBack = document.getElementById('project-back');
-    const projectTitle= document.getElementById('project-view-title');
-    const projectPhotos = document.getElementById('project-photos');
-    const galleryCta  = document.getElementById('gallery-cta');
+    const grid     = document.getElementById('gallery-grid');
+    const emptyNote= document.getElementById('gallery-empty-note');
 
-    // Lightbox
+    // --- Project modal ---
+    const modal      = document.getElementById('proj-modal');
+    const modalTitle = document.getElementById('proj-modal-title');
+    const modalGrid  = document.getElementById('proj-modal-grid');
+    const modalClose = document.getElementById('proj-modal-close');
+
+    // --- Single-photo lightbox ---
     const lb       = document.getElementById('lightbox');
     const lbImg    = document.getElementById('lb-img');
     const lbClose  = document.getElementById('lb-close');
@@ -173,102 +164,76 @@
 
     function openLightbox(urls, idx) {
       lbUrls = urls; lbIdx = idx;
-      lb.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+      lb.classList.add('open');
       showLb();
     }
-    function closeLightbox() {
-      lb.style.display = 'none';
-      document.body.style.overflow = '';
-    }
+    function closeLightbox() { lb.classList.remove('open'); }
     function showLb() {
       lbImg.src = lbUrls[lbIdx];
       lbCounter.textContent = (lbIdx + 1) + ' / ' + lbUrls.length;
-      lbPrev.style.opacity = lbIdx === 0 ? '.25' : '.7';
-      lbNext.style.opacity = lbIdx === lbUrls.length - 1 ? '.25' : '.7';
+      lbPrev.style.opacity = lbIdx === 0 ? '.25' : '1';
+      lbNext.style.opacity = lbIdx === lbUrls.length - 1 ? '.25' : '1';
     }
     lbClose.addEventListener('click', closeLightbox);
     lbPrev.addEventListener('click', () => { if (lbIdx > 0) { lbIdx--; showLb(); } });
     lbNext.addEventListener('click', () => { if (lbIdx < lbUrls.length - 1) { lbIdx++; showLb(); } });
+    lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+
+    // --- Open/close project modal ---
+    function openModal(proj, photos) {
+      const urls = photos.map(p => sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl);
+      modalTitle.textContent = proj.name;
+      modalGrid.innerHTML = photos.map((p, i) =>
+        '<div class="pm-thumb" data-idx="' + i + '">' +
+          '<img src="' + urls[i] + '" alt="" loading="lazy">' +
+        '</div>'
+      ).join('');
+      modalGrid.querySelectorAll('.pm-thumb').forEach(el => {
+        el.addEventListener('click', () => openLightbox(urls, +el.dataset.idx));
+        const img = el.querySelector('img');
+        img.addEventListener('load', () => img.classList.add('loaded'));
+        if (img.complete) img.classList.add('loaded');
+      });
+      modal.classList.add('open');
+      document.body.classList.add('modal-open');
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      document.body.classList.remove('modal-open');
+    }
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
     document.addEventListener('keydown', e => {
-      if (lb.style.display === 'none') return;
-      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'Escape') { closeLightbox(); closeModal(); }
+      if (!lb.classList.contains('open')) return;
       if (e.key === 'ArrowLeft' && lbIdx > 0) { lbIdx--; showLb(); }
       if (e.key === 'ArrowRight' && lbIdx < lbUrls.length - 1) { lbIdx++; showLb(); }
     });
-    lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
 
-    // Photo map: project_id → [photos]
+    // --- Load data ---
     let allProjects = [], photosByProject = {};
 
-    function showGrid() {
-      gallerySection.style.display = '';
-      projectView.style.display = 'none';
-      galleryCta.style.display = '';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      history.replaceState(null, '', location.pathname);
-    }
-
-    function showProject(projectId) {
-      const proj = allProjects.find(p => p.id === projectId);
-      if (!proj) return;
-      const photos = photosByProject[projectId] || [];
-      const urls = photos.map(p => sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl);
-
-      projectTitle.textContent = proj.name;
-      projectPhotos.innerHTML = photos.map((p, i) => {
-        const url = urls[i];
-        return '<div class="project-photo-item" data-idx="' + i + '">' +
-          '<img src="' + url + '" alt="' + proj.name + ' photo ' + (i+1) + '" loading="lazy">' +
-        '</div>';
-      }).join('');
-
-      projectPhotos.querySelectorAll('.project-photo-item').forEach(el => {
-        el.addEventListener('click', () => openLightbox(urls, +el.dataset.idx));
-        const img = el.querySelector('img');
-        if (img.complete) img.classList.add('loaded');
-        else img.addEventListener('load', () => img.classList.add('loaded'));
-      });
-
-      gallerySection.style.display = 'none';
-      galleryCta.style.display = 'none';
-      projectView.style.display = '';
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      history.replaceState(null, '', '#' + projectId);
-    }
-
-    projectBack.addEventListener('click', showGrid);
-
-    // Load data
     Promise.all([
       sb.from('gallery_projects').select('*').order('sort_order').order('created_at'),
       sb.from('gallery_photos').select('id, project_id, storage_path, sort_order, created_at').order('sort_order').order('created_at')
     ]).then(([{ data: projects, error: pErr }, { data: photos }]) => {
-      if (pErr || !projects || !projects.length) {
-        emptyNote.style.display = 'block';
-        return;
-      }
+      if (pErr || !projects || !projects.length) { emptyNote.style.display = 'block'; return; }
 
       allProjects = projects;
-
-      // Group photos by project
       (photos || []).forEach(ph => {
         if (!ph.project_id) return;
         if (!photosByProject[ph.project_id]) photosByProject[ph.project_id] = [];
         photosByProject[ph.project_id].push(ph);
       });
 
-      // Build cover map
-      const coverMap = {};
-      Object.keys(photosByProject).forEach(pid => { coverMap[pid] = photosByProject[pid][0]; });
-
       grid.innerHTML = projects.map((proj, i) => {
-        const cover = coverMap[proj.id];
+        const cover = (photosByProject[proj.id] || [])[0];
         const coverUrl = cover ? sb.storage.from('gallery').getPublicUrl(cover.storage_path).data.publicUrl : null;
         const cls = i % 2 === 1 ? 'work-item reveal d1' : 'work-item reveal';
         const artStyle = coverUrl ? 'background-image:url(' + coverUrl + ');background-size:cover;background-position:center' : '';
         const count = (photosByProject[proj.id] || []).length;
-        return '<button class="' + cls + '" data-project="' + proj.id + '" style="background:none;border:none;cursor:pointer;text-align:left;width:100%;">' +
+        return '<button class="' + cls + '" data-project="' + proj.id + '">' +
           '<div class="art tall" style="' + artStyle + '"></div>' +
           '<div class="work-meta"><strong>' + proj.name + '</strong>' +
             (count > 1 ? '<small>' + count + ' photos</small>' : '') +
@@ -277,13 +242,12 @@
       }).join('');
 
       grid.querySelectorAll('[data-project]').forEach(btn => {
-        btn.addEventListener('click', () => showProject(btn.dataset.project));
+        btn.addEventListener('click', () => {
+          const proj = allProjects.find(p => p.id === btn.dataset.project);
+          if (proj) openModal(proj, photosByProject[proj.id] || []);
+        });
         if (typeof revealObserver !== 'undefined') revealObserver.observe(btn);
       });
-
-      // Deep-link via hash
-      const hash = location.hash.replace('#', '');
-      if (hash && projects.find(p => p.id === hash)) showProject(hash);
     });
   })();
   </script>
