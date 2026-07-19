@@ -7,6 +7,8 @@
   <meta name="description" content="A gallery of walnut and epoxy pieces by Second Chance Slabs — river dining tables, sofa tables with Colorado river rock, mantels, and more.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://sfxubyyetfetfxbghuzo.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="https://sfxubyyetfetfxbghuzo.supabase.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=e5d87356">
 </head>
@@ -147,6 +149,14 @@
     const grid     = document.getElementById('gallery-grid');
     const emptyNote= document.getElementById('gallery-empty-note');
 
+    // Show skeleton cards immediately
+    grid.innerHTML = Array.from({length: 6}, () =>
+      '<div class="work-item skeleton">' +
+        '<div class="art tall skeleton-box"></div>' +
+        '<div class="work-meta"><div class="skeleton-line"></div></div>' +
+      '</div>'
+    ).join('');
+
     // --- Project modal ---
     const modal      = document.getElementById('proj-modal');
     const modalTitle = document.getElementById('proj-modal-title');
@@ -229,12 +239,16 @@
 
       grid.innerHTML = projects.map((proj, i) => {
         const cover = (photosByProject[proj.id] || [])[0];
-        const coverUrl = cover ? sb.storage.from('gallery').getPublicUrl(cover.storage_path).data.publicUrl : null;
+        const coverUrl = cover
+          ? sb.storage.from('gallery').getPublicUrl(cover.storage_path).data.publicUrl
+          : null;
         const cls = i % 2 === 1 ? 'work-item reveal d1' : 'work-item reveal';
-        const artStyle = coverUrl ? 'background-image:url(' + coverUrl + ');background-size:cover;background-position:center' : '';
         const count = (photosByProject[proj.id] || []).length;
+        const imgHtml = coverUrl
+          ? '<img src="' + coverUrl + '" alt="' + proj.name + '" loading="' + (i < 4 ? 'eager' : 'lazy') + '" decoding="async">'
+          : '';
         return '<button class="' + cls + '" data-project="' + proj.id + '">' +
-          '<div class="art tall" style="' + artStyle + '"></div>' +
+          '<div class="art tall">' + imgHtml + '</div>' +
           '<div class="work-meta"><strong>' + proj.name + '</strong>' +
             (count > 1 ? '<small>' + count + ' photos</small>' : '') +
           '</div>' +
@@ -246,6 +260,11 @@
           const proj = allProjects.find(p => p.id === btn.dataset.project);
           if (proj) openModal(proj, photosByProject[proj.id] || []);
         });
+        const img = btn.querySelector('.art img');
+        if (img) {
+          if (img.complete) img.classList.add('loaded');
+          else img.addEventListener('load', () => img.classList.add('loaded'));
+        }
         if (typeof revealObserver !== 'undefined') revealObserver.observe(btn);
       });
     });

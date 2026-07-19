@@ -364,7 +364,7 @@ h1, h2, h3, .display {
       #7fae9d 40%, #4c7267 50%, #2d4f47 55%, #7fae9d 62%,
       #5c4430 72%, #453322 86%, #38291b 100%);
 }
-.art.tall { aspect-ratio: 4 / 5; }
+.art.tall { aspect-ratio: 3 / 4; }
 .art.square { aspect-ratio: 1 / 1; }
 .art.river-green {
   background:
@@ -432,7 +432,8 @@ h1, h2, h3, .display {
 .panel-ivory { background: var(--ivory); }
 
 section { padding: var(--section) 0; }
-section.tight { padding-top: calc(var(--section) * 0.55); }
+section.tight { padding-top: calc(var(--section) * 0.55); padding-bottom: calc(var(--section) * 1.4); }
+section.tight:not(:has(.steps)) { padding-bottom: calc(var(--section) * 0.55); }
 
 /* --------------------------------------------------------------------------
    Cards & grids
@@ -505,6 +506,39 @@ section.tight { padding-top: calc(var(--section) * 0.55); }
 .work-item:hover .work-meta { transform: translateY(0); }
 .work-meta strong { font-family: var(--serif); font-size: 1.25rem; font-weight: 500; display: block; }
 .work-meta small { font-size: 0.82rem; opacity: 0.85; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.work-item .art { aspect-ratio: unset; }
+.work-item .art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.8s var(--ease-out), opacity 0.4s ease;
+  opacity: 0;
+}
+.work-item .art img.loaded { opacity: 1; }
+.work-item:hover .art img { transform: scale(1.04); }
+
+/* Skeleton loading state */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.work-item.skeleton { pointer-events: none; }
+.work-item.skeleton .art.tall { aspect-ratio: 3 / 4; }
+.skeleton-box {
+  background: linear-gradient(90deg, var(--mist) 25%, color-mix(in srgb, var(--mist) 60%, white) 50%, var(--mist) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.skeleton-line {
+  height: 1rem;
+  border-radius: 4px;
+  width: 60%;
+  margin: 0.4rem 0;
+  background: linear-gradient(90deg, var(--mist) 25%, color-mix(in srgb, var(--mist) 60%, white) 50%, var(--mist) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
 
 /* --------------------------------------------------------------------------
    Our Story — dark narrative section
