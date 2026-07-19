@@ -4,3 +4,10 @@ supabase/.temp/
 
 # Local Netlify folder
 .netlify
+
+# One-time data migration scripts
+do-upload.js
+update-gallery-meta.js
+upload-gallery.js
+upload-process.js
+upload-second.js
