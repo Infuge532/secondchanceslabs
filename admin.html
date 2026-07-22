@@ -343,6 +343,7 @@
   <nav class="admin-nav">
     <button class="admin-nav-btn active" onclick="showPanel('gallery')">Gallery Photos</button>
     <button class="admin-nav-btn" onclick="showPanel('process')">Process Photos</button>
+    <button class="admin-nav-btn" onclick="showPanel('story')">Our Story Photos</button>
     <button class="admin-nav-btn" onclick="showPanel('faqs')">FAQs</button>
     <button class="admin-nav-btn" onclick="showPanel('availability')">Availability</button>
   </nav>
@@ -416,6 +417,41 @@ alter table gallery_photos add column if not exists project_id uuid references g
         </div>
       </div>
       <div class="stage-list" id="stage-list">
+        <div class="gallery-empty">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Our Story Panel -->
+    <div class="admin-panel" id="panel-story">
+
+      <div id="story-photos-setup" class="avail-setup-banner" style="display:none">
+        <strong>Story photos table not set up yet.</strong> Run this SQL once in your
+        <a href="https://supabase.com/dashboard/project/sfxubyyetfetfxbghuzo/sql/new" target="_blank">Supabase SQL editor</a>, then refresh.
+        <button class="btn-ghost" style="margin-left:0.75rem;font-size:0.75rem" onclick="copyStorySql()">Copy SQL</button>
+        <pre id="story-setup-sql" style="display:none">-- Run once to enable Our Story photo management
+create table if not exists story_photos (
+  slot text primary key,
+  storage_path text,
+  alt_text text,
+  updated_at timestamptz default now()
+);
+alter table story_photos enable row level security;
+create policy "public read" on story_photos for select using (true);
+create policy "auth all" on story_photos for all using (auth.role() = 'authenticated');
+
+insert into story_photos (slot, alt_text) values
+  ('maker', 'The maker at work in the shop'),
+  ('name', 'A finished second chance slab table')
+on conflict (slot) do nothing;</pre>
+      </div>
+
+      <div class="panel-header">
+        <div>
+          <h2>Our Story Photos</h2>
+          <p>One photo per spot on the Our Story page — click Replace to swap it out.</p>
+        </div>
+      </div>
+      <div class="stage-list" id="story-list">
         <div class="gallery-empty">Loading…</div>
       </div>
     </div>
@@ -642,6 +678,10 @@ create policy "auth update" on commission_card for update using (auth.role() = '
 const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
 const STAGE_NAMES = ['Finding the Slab','The Layout','The Pour','CNC Flattening','A Week of Sanding','Finish & Support'];
+const STORY_SLOTS = [
+  { slot: 'maker', label: 'The Maker (33 Years on the Job Site)' },
+  { slot: 'name', label: "Why “Second Chance”" },
+];
 
 let pendingFiles = [];
 let currentFileIndex = 0;
@@ -691,6 +731,7 @@ function showAdmin() {
   document.getElementById('admin-screen').style.display = 'block';
   loadProjects();
   loadProcessPhotos();
+  loadStoryPhotos();
   loadFaqs();
   loadAvailability();
 }
@@ -1028,6 +1069,74 @@ async function removeStagePhoto(stage, storagePath) {
   await sb.from('process_photos').update({ storage_path: null }).eq('stage', stage);
   showToast('Photo removed.');
   loadProcessPhotos();
+}
+
+// ── Our Story Photos ───────────────────────────────────────────────────────────
+async function loadStoryPhotos() {
+  const list = document.getElementById('story-list');
+  const { data, error } = await sb.from('story_photos').select('*');
+  if (error) {
+    document.getElementById('story-photos-setup').style.display = 'block';
+    document.getElementById('story-setup-sql').style.display = 'block';
+    list.innerHTML = '<div class="gallery-empty">Set up the table above first.</div>';
+    return;
+  }
+  document.getElementById('story-photos-setup').style.display = 'none';
+  const bySlot = {};
+  (data || []).forEach(row => { bySlot[row.slot] = row; });
+
+  list.innerHTML = STORY_SLOTS.map(({ slot, label }) => {
+    const row = bySlot[slot] || {};
+    const thumbHtml = row.storage_path
+      ? `<img class="stage-thumb" src="${sb.storage.from('gallery').getPublicUrl(row.storage_path).data.publicUrl}" alt="${row.alt_text || ''}" onerror="this.style.display='none'">`
+      : `<div class="stage-thumb-empty">No photo yet</div>`;
+    return `<div class="stage-item" id="story-${slot}">
+      ${thumbHtml}
+      <div class="stage-info">
+        <div class="stage-label">Our Story</div>
+        <div class="stage-name">${label}</div>
+      </div>
+      <div class="stage-actions">
+        <input type="file" class="stage-file-input" id="story-input-${slot}" accept="image/jpeg,image/png,image/webp" onchange="uploadStoryPhoto('${slot}', this)">
+        <button class="btn-ghost" onclick="document.getElementById('story-input-${slot}').click()">${row.storage_path ? 'Replace' : 'Upload'}</button>
+        ${row.storage_path ? `<button class="btn-danger" onclick="removeStoryPhoto('${slot}', '${escJs(row.storage_path)}')">Remove</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function uploadStoryPhoto(slot, input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!ALLOWED_TYPES.has(file.type)) { showToast('Only JPG, PNG, and WebP files are accepted.', true); input.value = ''; return; }
+  if (file.size > MAX_FILE_BYTES) { showToast('File exceeds the 10 MB limit.', true); input.value = ''; return; }
+  const btn = document.querySelector(`#story-${slot} .btn-ghost`);
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const ext = file.name.split('.').pop();
+  const path = `story/${slot}-${Date.now()}.${ext}`;
+  const { error: upErr } = await sb.storage.from('gallery').upload(path, file, { upsert: true });
+  if (upErr) { showToast('Upload failed: ' + upErr.message, true); btn.innerHTML = 'Replace'; btn.disabled = false; return; }
+
+  const { error: dbErr } = await sb.from('story_photos').update({ storage_path: path, updated_at: new Date().toISOString() }).eq('slot', slot);
+  if (dbErr) { showToast('DB update failed: ' + dbErr.message, true); return; }
+
+  showToast('Photo updated!');
+  loadStoryPhotos();
+}
+
+async function removeStoryPhoto(slot, storagePath) {
+  if (!confirm('Remove this photo?')) return;
+  await sb.storage.from('gallery').remove([storagePath]);
+  await sb.from('story_photos').update({ storage_path: null }).eq('slot', slot);
+  showToast('Photo removed.');
+  loadStoryPhotos();
+}
+
+function copyStorySql() {
+  const sql = document.getElementById('story-setup-sql').textContent;
+  navigator.clipboard.writeText(sql).then(() => showToast('SQL copied!')).catch(() => showToast('Copy failed', true));
 }
 
 // ── FAQs ──────────────────────────────────────────────────────────────────────

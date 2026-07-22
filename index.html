@@ -12,7 +12,7 @@
 </head>
 <body>
 
-  <div class="topbar">Now accepting a limited number of fall commissions <a href="contact.html">Start yours &rarr;</a></div>
+  <div class="topbar">Now accepting a limited number of fall commissions <a href="contact.html">Start yours today &rarr;</a></div>
 
   <nav class="nav">
     <ul class="nav-links">
@@ -129,19 +129,30 @@
       <h2 class="display-lg reveal d1">The Pieces So Far</h2>
     </div>
     <div class="container" style="margin-top:3rem;">
-      <div class="work-grid" id="home-gallery-grid">
-        <a class="work-item reveal" href="gallery.html">
-          <div class="art tall"></div>
-          <div class="work-meta"><small>Dining</small><strong>Walnut River Dining Table</strong></div>
-        </a>
-        <a class="work-item reveal d1" href="gallery.html">
-          <div class="art rock tall"></div>
-          <div class="work-meta"><small>Living Room</small><strong>River Rock Sofa Table</strong></div>
-        </a>
-      </div>
+      <div class="work-grid" id="home-gallery-grid"></div>
       <p class="center" style="margin-top:2.5rem;"><a class="btn btn-outline" href="gallery.html">View the full gallery</a></p>
     </div>
   </section>
+
+  <!-- Project popup modal -->
+  <div id="proj-modal" aria-modal="true" role="dialog" aria-label="Project photos">
+    <div id="proj-modal-inner">
+      <div id="proj-modal-header">
+        <span id="proj-modal-title"></span>
+        <button id="proj-modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div id="proj-modal-grid"></div>
+    </div>
+  </div>
+
+  <!-- Single-photo lightbox -->
+  <div id="lightbox" aria-modal="true" role="dialog" aria-label="Photo viewer">
+    <button id="lb-close" aria-label="Close">&times;</button>
+    <button id="lb-prev" aria-label="Previous">&#8592;</button>
+    <img id="lb-img" src="" alt="">
+    <button id="lb-next" aria-label="Next">&#8594;</button>
+    <div id="lb-counter"></div>
+  </div>
 
   <section class="tight">
     <div class="panel container" style="padding: clamp(3rem, 7vw, 5.5rem) var(--gutter);">
@@ -276,7 +287,7 @@
     <div class="footer-bottom">
       <span>&copy; 2026 Second Chance Slabs. All rights reserved.</span>
       <span>Kansas City, Missouri</span>
-      <span>Built by <a href="https://builtforsmallbiz.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">builtforsmallbiz.com</a></span>
+      <span>Designed by <a href="https://builtforsmallbiz.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">BuiltForSmallBiz.com</a></span>
     </div>
   </footer>
 
@@ -321,18 +332,115 @@
       }
     });
 
-    sb.from('gallery_photos').select('*').order('sort_order').order('created_at').limit(2).then(({ data }) => {
-      if (!data || !data.length) return;
-      grid.innerHTML = data.map((p, i) => {
-        const url = sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl;
-        const cls = i === 1 ? 'work-item reveal d1' : 'work-item reveal';
-        const meta = [p.category, p.caption].filter(Boolean).join(' · ');
-        return '<a class="' + cls + '" href="gallery.html">' +
-          '<div class="art tall" style="background-image:url(' + url + ');background-size:cover;background-position:center"></div>' +
-          '<div class="work-meta"><small>' + (meta || '&nbsp;') + '</small><strong>' + (p.piece_name || '') + '</strong></div>' +
-          '</a>';
+    // --- Project modal (same behavior as the gallery page) ---
+    const modal      = document.getElementById('proj-modal');
+    const modalTitle = document.getElementById('proj-modal-title');
+    const modalGrid  = document.getElementById('proj-modal-grid');
+    const modalClose = document.getElementById('proj-modal-close');
+
+    // --- Single-photo lightbox ---
+    const lb       = document.getElementById('lightbox');
+    const lbImg    = document.getElementById('lb-img');
+    const lbClose  = document.getElementById('lb-close');
+    const lbPrev   = document.getElementById('lb-prev');
+    const lbNext   = document.getElementById('lb-next');
+    const lbCounter= document.getElementById('lb-counter');
+    let lbUrls = [], lbIdx = 0;
+
+    function openLightbox(urls, idx) {
+      lbUrls = urls; lbIdx = idx;
+      lb.classList.add('open');
+      showLb();
+    }
+    function closeLightbox() { lb.classList.remove('open'); }
+    function showLb() {
+      lbImg.src = lbUrls[lbIdx];
+      lbCounter.textContent = (lbIdx + 1) + ' / ' + lbUrls.length;
+      lbPrev.style.opacity = lbIdx === 0 ? '.25' : '1';
+      lbNext.style.opacity = lbIdx === lbUrls.length - 1 ? '.25' : '1';
+    }
+    lbClose.addEventListener('click', closeLightbox);
+    lbPrev.addEventListener('click', () => { if (lbIdx > 0) { lbIdx--; showLb(); } });
+    lbNext.addEventListener('click', () => { if (lbIdx < lbUrls.length - 1) { lbIdx++; showLb(); } });
+    lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+
+    function openModal(proj, photos) {
+      const urls = photos.map(p => sb.storage.from('gallery').getPublicUrl(p.storage_path).data.publicUrl);
+      modalTitle.textContent = proj.name;
+      modalGrid.innerHTML = photos.map((p, i) =>
+        '<div class="pm-thumb" data-idx="' + i + '">' +
+          '<img src="' + urls[i] + '" alt="" loading="lazy">' +
+        '</div>'
+      ).join('');
+      modalGrid.querySelectorAll('.pm-thumb').forEach(el => {
+        el.addEventListener('click', () => openLightbox(urls, +el.dataset.idx));
+        const img = el.querySelector('img');
+        img.addEventListener('load', () => img.classList.add('loaded'));
+        if (img.complete) img.classList.add('loaded');
+      });
+      modal.classList.add('open');
+      document.body.classList.add('modal-open');
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      document.body.classList.remove('modal-open');
+    }
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closeLightbox(); closeModal(); }
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'ArrowLeft' && lbIdx > 0) { lbIdx--; showLb(); }
+      if (e.key === 'ArrowRight' && lbIdx < lbUrls.length - 1) { lbIdx++; showLb(); }
+    });
+
+    const featuredNames = ['Console Table', 'Black Island Kitchen'];
+
+    Promise.all([
+      sb.from('gallery_projects').select('*').in('name', featuredNames),
+      sb.from('gallery_photos').select('id, project_id, storage_path, sort_order, created_at').order('sort_order').order('created_at')
+    ]).then(([{ data: projects }, { data: photos }]) => {
+      if (!projects || !projects.length) return;
+
+      const ordered = featuredNames.map(n => projects.find(p => p.name === n)).filter(Boolean);
+      const photosByProject = {};
+      (photos || []).forEach(ph => {
+        if (!ph.project_id) return;
+        if (!photosByProject[ph.project_id]) photosByProject[ph.project_id] = [];
+        photosByProject[ph.project_id].push(ph);
+      });
+
+      grid.innerHTML = ordered.map((proj, i) => {
+        const cover = (photosByProject[proj.id] || [])[0];
+        const coverUrl = cover
+          ? sb.storage.from('gallery').getPublicUrl(cover.storage_path).data.publicUrl
+          : null;
+        const cls = i % 2 === 1 ? 'work-item reveal d1' : 'work-item reveal';
+        const count = (photosByProject[proj.id] || []).length;
+        const imgHtml = coverUrl
+          ? '<img src="' + coverUrl + '" alt="' + proj.name + '" loading="eager" decoding="async">'
+          : '';
+        return '<button class="' + cls + '" data-project="' + proj.id + '">' +
+          '<div class="art tall">' + imgHtml + '</div>' +
+          '<div class="work-meta"><strong>' + proj.name + '</strong>' +
+            (count > 1 ? '<small>' + count + ' photos</small>' : '') +
+          '</div>' +
+        '</button>';
       }).join('');
-      grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+      grid.querySelectorAll('[data-project]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const proj = ordered.find(p => p.id === btn.dataset.project);
+          if (proj) openModal(proj, photosByProject[proj.id] || []);
+        });
+        const img = btn.querySelector('.art img');
+        if (img) {
+          if (img.complete) img.classList.add('loaded');
+          else img.addEventListener('load', () => img.classList.add('loaded'));
+        }
+        if (typeof revealObserver !== 'undefined') revealObserver.observe(btn);
+      });
     });
   })();
   </script>

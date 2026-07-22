@@ -12,7 +12,7 @@
 </head>
 <body>
 
-  <div class="topbar">Now accepting a limited number of fall commissions <a href="contact.html">Start yours &rarr;</a></div>
+  <div class="topbar">Now accepting a limited number of fall commissions <a href="contact.html">Start yours today &rarr;</a></div>
 
   <nav class="nav">
     <ul class="nav-links">
@@ -39,7 +39,7 @@
   <section class="tight">
     <div class="container">
       <div class="grid-2">
-        <div class="art tall reveal" style="border-radius: var(--radius-lg);"></div>
+        <div class="art tall reveal" data-story-slot="maker" style="border-radius: var(--radius-lg);"></div>
         <div>
           <span class="eyebrow reveal">The Maker</span>
           <h2 class="display-lg reveal d1">Thirty-Three Years<br><em class="display-italic">on the Job Site</em></h2>
@@ -95,7 +95,7 @@
           <p class="reveal d3" style="color:var(--ink-soft);">Framed, poured, flattened, and sanded through eight grits, that same tree becomes the table where a family eats for generations — an heirloom with a first life in the forest and a second one in your home.</p>
           <p style="margin-top:2rem;"><a class="text-link reveal d3" href="process.html">See how a slab becomes a table</a></p>
         </div>
-        <div class="art river-green tall reveal d1" style="border-radius: var(--radius-lg);"></div>
+        <div class="art river-green tall reveal d1" data-story-slot="name" style="border-radius: var(--radius-lg);"></div>
       </div>
     </div>
   </section>
@@ -136,10 +136,28 @@
     <div class="footer-bottom">
       <span>&copy; 2026 Second Chance Slabs. All rights reserved.</span>
       <span>Kansas City, Missouri</span>
-      <span>Built by <a href="https://builtforsmallbiz.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">builtforsmallbiz.com</a></span>
+      <span>Designed by <a href="https://builtforsmallbiz.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">BuiltForSmallBiz.com</a></span>
     </div>
   </footer>
 
   <script src="script.js?v=651be482"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+  (function(){
+    const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+    sb.from('story_photos').select('*').then(({ data }) => {
+      if (!data) return;
+      data.forEach(row => {
+        if (!row.storage_path) return;
+        const el = document.querySelector('.art[data-story-slot="' + row.slot + '"]');
+        if (!el) return;
+        const url = sb.storage.from('gallery').getPublicUrl(row.storage_path).data.publicUrl;
+        el.innerHTML = '<img src="' + url + '" alt="' + (row.alt_text || '') + '" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">';
+      });
+    });
+  })();
+  </script>
 </body>
 </html>
